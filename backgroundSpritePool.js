@@ -11,8 +11,9 @@ class BackgroundSpritesPool extends SpritePool {
             let sheet = resources[resourceId].spritesheet;
             let sprite = new TilingSprite(sheet.textures["background.png"],160,144);
             sprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-            sprite.scale.x=5;
-            sprite.scale.y=3.2;
+            var ratio = 160/144;//viewport ratio
+            sprite.scale.set((500*ratio)/160,500/144);
+            sprite.width=1200;
             sprite.tilePosition.x = 0;
             sprite.tilePosition.y = 0;
             sprite.anchor.x = 0;

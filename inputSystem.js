@@ -15,10 +15,11 @@ class InputSystem {
         //up
         // press
         if(this.up.isDown&&this.up.semaphoreDown){
+            console.log("pressed up");
             let playerEntity = this.entitiesManager.getPlayerEntities()[0];
             // if (playerEntity.body.velocity.y > 0.8) return;
             if (playerEntity.body.velocity.y  <0.2 && playerEntity.body.velocity.y  > -0.2)
-                Body.setVelocity(playerEntity.body, {x: playerEntity.body.velocity.x, y: -6});
+                Body.setVelocity(playerEntity.body, {x: playerEntity.body.velocity.x, y: -12});
             if(!this.up.allowPressed) this.up.semaphoreDown=false;
             this.up.semaphoreUp=true;
         }
@@ -34,10 +35,10 @@ class InputSystem {
         // press
         if(this.right.isDown&&this.right.semaphoreDown){
             let playerEntity = this.entitiesManager.getPlayerEntities()[0];
-            Body.setVelocity(playerEntity.body, {x: 2, y: playerEntity.body.velocity.y});
+            Body.setVelocity(playerEntity.body, {x: 4, y: playerEntity.body.velocity.y});
             if (playerEntity.sprite) {
                 playerEntity.sprite.scale.x = Math.abs(playerEntity.sprite.scale.x);
-                // playerEntity.sprite.play();
+                playerEntity.sprite.play();
             }
             if(!this.right.allowPressed) this.up.semaphoreDown=false;
             this.right.semaphoreUp=true;
@@ -47,7 +48,7 @@ class InputSystem {
             let playerEntity = this.entitiesManager.getPlayerEntities()[0];
             Body.setVelocity(playerEntity.body, {x: 0, y: playerEntity.body.velocity.y});
             if (playerEntity.sprite) {
-                // playerEntity.sprite.stop();
+                playerEntity.sprite.stop();
             }
             this.right.semaphoreUp=false;
         }
@@ -56,10 +57,10 @@ class InputSystem {
         // press
         if(this.left.isDown&&this.left.semaphoreDown){
             let playerEntity = this.entitiesManager.getPlayerEntities()[0];
-            Body.setVelocity(playerEntity.body, {x: -2, y: playerEntity.body.velocity.y});
+            Body.setVelocity(playerEntity.body, {x: -4, y: playerEntity.body.velocity.y});
             if (playerEntity.sprite) {
                 playerEntity.sprite.scale.x = Math.abs(playerEntity.sprite.scale.x) * -1;
-                // playerEntity.sprite.play();
+                playerEntity.sprite.play();
             }
             if(!this.left.allowPressed) this.up.semaphoreDown=false;
             this.left.semaphoreUp=true;
@@ -69,17 +70,38 @@ class InputSystem {
             let playerEntity = this.entitiesManager.getPlayerEntities()[0];
             Body.setVelocity(playerEntity.body, {x: 0, y: playerEntity.body.velocity.y});
             if (playerEntity.sprite) {
-                // playerEntity.sprite.stop();
+                playerEntity.sprite.stop();
             }
             this.left.semaphoreUp=false;
         }
+
+        //n key
+        // press
+        if(this.keyN.isDown&&this.keyN.semaphoreDown){
+            let playerEntity = this.entitiesManager.getPlayerEntities()[0];
+            let bullet = Bodies.rectangle(playerEntity.body.bounds.max.x + 50, playerEntity.body.position.y - 10, 14, 6, {
+                restitution: 0,
+                friction: 0,
+                frictionAir: 0
+            });
+            Body.setVelocity(bullet, {x: 6, y: 0});
+
+            bullet.customType = 'BULLET';
+            let bulletEntity = new BulletEntity();
+            bulletEntity.body = bullet;
+            this.entitiesManager.addBulletEntity(bulletEntity);
+
+            World.add(this.engine.world, bullet);
+            if(!this.left.allowPressed) this.up.semaphoreDown=false;
+            this.left.semaphoreUp=true;
+        }
+        //release  - non
 
     }
     init() {
         this.up = this.keyboard("ArrowUp", false);
         this.right = this.keyboard("ArrowRight");
         this.left = this.keyboard("ArrowLeft");
-        this.keyD = this.keyboard("d");
         this.keyN = this.keyboard("n");
 
         //Up

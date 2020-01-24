@@ -2,7 +2,7 @@ class BulletSpritesPool extends SpritePool {
 
     constructor() {
         super();
-        this.addBulletSprites(10,"images/bullet.png");
+        this.addBulletSprites(20,"images/bullet.png");
     }
 
     addBulletSprites(amount, resourceId) {
