@@ -14,8 +14,8 @@ class FloorThinSpritesPool extends SpritePool {
             sprite.scale.y =4
             sprite.anchor.x=0.5;
             sprite.anchor.y=0.5;
-
-            this.sprites.push(sprite);
+            sprite.customState= GenericStateEnum.DEFAULT;//custom field
+            this.sprites[GenericStateEnum.DEFAULT].push(sprite);
         }
     };
 

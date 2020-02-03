@@ -20,91 +20,45 @@ let Application = PIXI.Application,
     TilingSprite = PIXI.TilingSprite;
 
 //Define any variables that are used in more than one function
-let  wallSprite, groundSprite;//Sprites
 
-//let myBulletEntities =  [];
 let entitiesManager;
-let backSprite;
 
-let ground, wall;
-let pixiStage, pixiRenderer;
 let engine;
 let runner;
 
-let graphicsSystem, inputSystem;
+let graphicsSystem, inputSystem, physicsSystem,maintenanceSystem, stateSystem;
 
 let viewPort = new ViewPort({width:1200, height:500});
 
-let oldTime, lag=0, lagInput=0;
-let MS_PER_UPDATE=16.666;
+let oldTime;
 
 function main() {
-    //create entities manager
-    entitiesManager = new EntitiesManager();
-
-    //MatterJs stuff
-    createMatterModel();
-
-    ////PIXIJs stuff
-    createPixiModel();
-
-}
-
-function createPixiModel() {
-    // setup renderer and ticker
-    pixiRenderer = new PIXI.Renderer({ width: 1200, height: 500, backgroundColor: 0xA3ECEE, view: $("#secondCanv")[0],  antialiasing: true,});
-    pixiStage = new PIXI.Container();
-
-    //Create a Pixi Application
-    // pixiApp = new Application({
-    //     width: 1200,
-    //     height: 500,
-    //     antialiasing: true,
-    //     transparent: false,
-    //     resolution: 1,
-    //     view: $("#secondCanv")[0] //custom canvas
-    // });
-    //
-    // pixiApp.renderer.backgroundColor = 0xA3ECEE;
-
-
     //Add the canvas that Pixi automatically created for you to the HTML document
     //document.body.appendChild(pixiApp.view); not neccesary because I created the canvas manually
-   // PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST;
     loader
-        .add("images/bullet.png")
-        .add("images/textures/rock01.jpg")
-        .add("images/textures/rock02.jpg")
         .add("images/game/game.json")
         .load(setup);
 
 }
 
-
-
 function setup() {
-
-
-    entitiesManager.addBackgroundEntity(new BackgroundEntity());
+    //create entities manager
+    entitiesManager = new EntitiesManager();
 
     //create graphics system
-    graphicsSystem = new GraphicsSystem(pixiStage, entitiesManager, viewPort);
-
+    graphicsSystem = new GraphicsSystem( entitiesManager);
+    //physics system create
+    physicsSystem = new PhysicsSystem(entitiesManager);
     //input system create
-    inputSystem = new InputSystem(entitiesManager,engine);
+    inputSystem = new InputSystem(entitiesManager,physicsSystem.engine,viewPort);
+    //maintenance system
+    maintenanceSystem = new MaintenanceSystem(entitiesManager);
+    //state system
+    stateSystem = new StateSystem((entitiesManager));
+    //MatterJs stuff
+    createMatterModel();
 
-
-    //walll
-    //Create the `wall` sprite
-    wallSprite = new TilingSprite(resources["images/textures/rock01.jpg"].texture,1024,1024);
-    pixiStage.addChild(wallSprite);
-
-    wallSprite.width =100;
-    wallSprite.height = 60;
-    wallSprite.tilePosition.x = 0;
-    wallSprite.tilePosition.y = 0;
-    wallSprite.anchor.x = 0.5;
-    wallSprite.anchor.y = 0.5;
+    entitiesManager.addBackgroundEntity(new BackgroundEntity());
 
     //for deltas time
     oldTime = performance.now();
@@ -116,27 +70,20 @@ function gameLoop(delta) {
     let newTime = performance.now();
     let deltaTime = newTime - oldTime;
     oldTime = newTime;
-    lag += deltaTime;
-    lagInput +=deltaTime;
+    // lag += deltaTime;
 
-    if(lagInput>50){
-        inputSystem.update();
-        lagInput = 0;
-    }
-    while (lag > MS_PER_UPDATE) {
-        Engine.update(engine, MS_PER_UPDATE);
+    inputSystem.update(deltaTime);
 
-        lag -= MS_PER_UPDATE;
-    }
-    //update wall position
-    wallSprite.x = wall.position.x - viewPort.offset.x;
-    wallSprite.y = wall.position.y;
-    wallSprite.rotation = wall.angle;
+    physicsSystem.update(deltaTime);
 
+    stateSystem.update();
+
+    //update graphics and render
     graphicsSystem.update();
 
+    //clean up stuff
+    maintenanceSystem.update();
 
-    pixiRenderer.render(pixiStage);
     requestAnimationFrame(gameLoop);
      // debugGetFPS();
 
@@ -153,13 +100,6 @@ function debugGetFPS(){
 }
 function createMatterModel() {
 
-    // create an engine
-    engine = Engine.create();
-    var world = engine.world;
-    runner = Runner.create();
-
-    engine.world.gravity.y = 1.7;
-
     // create a renderer
     var render = Render.create({
         element: document.body,
@@ -167,7 +107,7 @@ function createMatterModel() {
             width: 1200,
             height: 600
         },
-        engine: engine
+        engine: physicsSystem.engine
     });
 
     //dynamic floor
@@ -179,18 +119,20 @@ function createMatterModel() {
         }else{
             floor = Bodies.rectangle(-300 + i * 64, 436, 64, 128, {isStatic: true, friction: 0});
         }
-        floorEntity = new FloorEntity();
+        let floorEntity = new FloorEntity();
         floorEntity.body = floor;
+        floorEntity.viewPort = viewPort;
         entitiesManager.addFloorEntity(floorEntity);
-        World.add(engine.world, floorEntity.body);
+        World.add(physicsSystem.engine.world, floorEntity.body);
     }
     // create two boxes and a ground
-    let monster = Bodies.rectangle(410, 300, 64, 64);
+    let monster = Bodies.rectangle(600, 300, 64, 64);
     Body.setInertia(monster, Infinity);//lock rotation for dude
-    enemyEntity = new EnemyEntity();
+    let enemyEntity = new EnemyEntity();
     enemyEntity.body = monster;
+    enemyEntity.viewPort = viewPort;
     enemyEntity.body.customType = "ENEMY";
-    enemyEntity.selfMovement = new MovementComponent(engine);
+    enemyEntity.selfMovement = new EnemyMovementComponent();
 
     entitiesManager.addEnemyEntity(enemyEntity);
 
@@ -198,76 +140,43 @@ function createMatterModel() {
     Body.setInertia(player, Infinity);//lock rotation for dude
 
     //player entity
-    playerEntity = new PlayerEntity();
+    let playerEntity = new PlayerEntity();
     playerEntity.body = player;
+    playerEntity.viewPort = viewPort;
     playerEntity.body.customType ="PLAYER";
     entitiesManager.addPlayerEntity(playerEntity);
 
-    // ground = Bodies.rectangle(300, 470, 600, 60, { isStatic: true });
-    wall = Bodies.rectangle(50, 300, 100, 60, { isStatic: true , friction: 0.3 });
+    // bigbrick
+    let bigbrick = Bodies.rectangle(50, 300, 64, 64, { isStatic: true , friction: 0.3 });
+    let bigBrickEntity = new BigBrickEntity();
+    bigBrickEntity.body = bigbrick;
+    bigBrickEntity.viewPort = viewPort;
+    bigBrickEntity.body.customType = "BIGBRICK";
+    entitiesManager.addBigBrickEntity(bigBrickEntity);
 
-    //disable gravity for objects in noGravity List
-    Events.on(engine, 'beforeUpdate', function() {
-        //entities that self move
-        for (let entity of entitiesManager.getEntitiesWithSelfMovementAndBodyComponent()) {
-            entity.selfMovement.move(entity.body);
-        }
-        //entities that avoid gravity
-        var gravity = engine.world.gravity;
-        for (let noGravityBody of entitiesManager.getBulletEntities()) {
-                Body.applyForce(noGravityBody.body, noGravityBody.body.position, {
-                    x: -gravity.x * gravity.scale * noGravityBody.body.mass,
-                    y: -gravity.y * gravity.scale * noGravityBody.body.mass
-                });
-        }
-
-    });
-    // Event listener: collision bullet
-    Matter.Events.on(engine, 'collisionStart', function(event) {//collisionEnd
-        // We know there was a collision so fetch involved elements ...
-        let aElm = event.pairs[0].bodyA;
-        let bElm = event.pairs[0].bodyB;
-
-        if(aElm.customType=='BULLET'){
-            // World.remove(world,aElm);
-           // aElm.toDelete=true;
-            removeBulletBodyFromentitiesList(entitiesManager.getBulletEntities(), aElm.id);
-
-        }
-
-        if(bElm.customType=='BULLET'){
-            //World.remove(world,bElm);
-            //bElm.toDelete=true;
-            removeBulletBodyFromentitiesList(entitiesManager.getBulletEntities(), bElm.id);
-        }
-
-        if((aElm.customType=='ENEMY'  && bElm.customType=='PLAYER')||(bElm.customType=='ENEMY'  && aElm.customType=='PLAYER')){
-
-            // engine.timing.timeScale = 0;//this pauses the engine
-            console.log("YOu DIeD!")
-        }
-        // Now do something with the event and elements ... your task ;-)
-    });
+    //some coin
+    for(let i=0;i<5;i++) {
+        let coin = Bodies.rectangle(250+i*100, 300, 32, 32, {isStatic: true, isSensor: true});
+        Body.setInertia(coin, Infinity);//lock rotation for dude
+        let coinEntity = new CoinEntity();
+        coinEntity.body = coin;
+        coinEntity.viewPort = viewPort;
+        coinEntity.body.customType = "COIN";
+        entitiesManager.addCoinEntity(coinEntity);
+        World.add(physicsSystem.engine.world, coin);
+    }
 
     // add all of the bodies to the world
-    World.add(engine.world, [monster, player, wall]);
-
-    // run the engine
-    //Engine.run(engine);
+    World.add(physicsSystem.engine.world, [monster, player, bigbrick]);
 
     //engine.timing.timeScale = 0;//this pauses the engine
     // run the renderer
    Render.run(render);
 
-    //some log
-    // setInterval(function () {
-    //     console.log(player.velocity.x);
-    // }, 100);
-
     // add mouse control
     var mouse = Mouse.create($("#secondCanv")[0]);
     mouse.offset = viewPort.offset;//todo: kind of hack, but works
-    var mouseConstraint = MouseConstraint.create(engine, {
+    var mouseConstraint = MouseConstraint.create(physicsSystem.engine, {
             mouse: mouse,
             constraint: {
                 stiffness: 0.2,
@@ -277,23 +186,12 @@ function createMatterModel() {
             }
         });
 
-    World.add(world, mouseConstraint);
+    World.add(physicsSystem.engine.world, mouseConstraint);
     // keep the mouse in sync with rendering
-    render.mouse = mouse;
+    // render.mouse = mouse;
 }
 
-function removeBulletBodyFromentitiesList(listEntities, bodyId){
-    for(let i=listEntities.length-1;i>=0;i--){//move this inside bullet entity
-        if(listEntities[i].body.id==bodyId){
-            if(listEntities[i].sprite) {//not undefined
-                pixiStage.removeChild(listEntities[i].sprite);
-                graphicsSystem.bulletSpritePool.returnSprite(listEntities[i].sprite);//temporal fix
-            }
-            World.remove(engine.world,listEntities[i].body);
-            listEntities.splice(i,1);
-        }
-    }
-}
+
 
 $(document).ready(function () {
     main();

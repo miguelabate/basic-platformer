@@ -2,10 +2,10 @@ class EnemySpritesPool extends SpritePool {
 
     constructor() {
         super();
-        this.addPlayerSprites(1,"images/game/game.json");
+        this.addEnemySprites(1,"images/game/game.json");
     }
 
-    addPlayerSprites(amount, resourceId) {
+    addEnemySprites(amount, resourceId) {
         for (var i = 0; i < amount; i++)
         {
             let sheet = resources[resourceId].spritesheet;
@@ -17,8 +17,8 @@ class EnemySpritesPool extends SpritePool {
             sprite.height=64;
             sprite.anchor.x=0.5;
             sprite.anchor.y=0.5;
-
-            this.sprites.push(sprite);
+            sprite.customState= GenericStateEnum.DEFAULT;//custom field
+            this.sprites[GenericStateEnum.DEFAULT].push(sprite);
         }
     };
 

@@ -18,8 +18,8 @@ class BackgroundSpritesPool extends SpritePool {
             sprite.tilePosition.y = 0;
             sprite.anchor.x = 0;
             sprite.anchor.y = 0;
-
-            this.sprites.push(sprite);
+            sprite.customState= GenericStateEnum.DEFAULT;//custom field
+            this.sprites[GenericStateEnum.DEFAULT].push(sprite);
         }
     };
 
