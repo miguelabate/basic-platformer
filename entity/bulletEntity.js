@@ -1,13 +1,13 @@
 class BulletEntity {
 
-    type="BULLET";
+    type=GlobalConfig.entities.bullet.type;
     body={};//Matter Body
     sprite=undefined;// Pixi Sprite
     existsOutsideViewPort=false;
     viewPort=undefined;
     state = new StateComponent(GenericStateEnum.DEFAULT);
     selfMovement = new BulletMovementComponent();
-    bearing="RIGHT";
+    bearing=BearingEnum.RIGHT;
 
     constructor() {
     }

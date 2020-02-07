@@ -1,6 +1,6 @@
 class BackgroundEntity {
 
-    type="BACKGROUND";
+    type=GlobalConfig.entities.background.type;
     sprite=undefined;// Pixi Sprite
     existsOutsideViewPort=true;
 

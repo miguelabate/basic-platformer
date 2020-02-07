@@ -1,6 +1,6 @@
 class CoinEntity {
 
-    type = "COIN";
+    type = GlobalConfig.entities.coin.type;
     body = undefined;//Matter Body
     sprite = undefined;// Pixi Sprite
     existsOutsideViewPort = true;

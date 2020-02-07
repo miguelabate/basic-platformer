@@ -26,68 +26,53 @@ class PlayerSpritesPool extends SpritePool {
             //left
             let  sprite = new PIXI.AnimatedSprite(this.walkingTextures);
             sprite.animationSpeed = 0.2;
-            sprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-            sprite.scale.x =4;
-            sprite.scale.y =4;
-            sprite.anchor.x=0.5;
-            sprite.anchor.y=0.5;
-            sprite.scale.x=sprite.scale.x*-1;
+            this.applyCommonSpriteSettings(sprite,true);
             sprite.customState= PlayerStateEnum.MOVE_LEFT;//custom field
             this.sprites[PlayerStateEnum.MOVE_LEFT].push(sprite);
 
             //right
             sprite = new PIXI.AnimatedSprite(this.walkingTextures);
             sprite.animationSpeed = 0.2;
-            sprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-            sprite.scale.x =4;
-            sprite.scale.y =4;
-            sprite.anchor.x=0.5;
-            sprite.anchor.y=0.5;
+            this.applyCommonSpriteSettings(sprite,false);
             sprite.customState= PlayerStateEnum.MOVE_RIGHT;//custom field
             this.sprites[PlayerStateEnum.MOVE_RIGHT].push(sprite);
 
             //jump right
             sprite = new Sprite(this.jumpTextures[0]);
-            sprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-            sprite.scale.x =4;
-            sprite.scale.y =4;
-            sprite.anchor.x=0.5;
-            sprite.anchor.y=0.5;
+            this.applyCommonSpriteSettings(sprite,false);
             sprite.customState= PlayerStateEnum.JUMP_RIGHT;//custom field
             this.sprites[PlayerStateEnum.JUMP_RIGHT].push(sprite);
 
             //jump left
             sprite = new Sprite(this.jumpTextures[0]);
-            sprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-            sprite.scale.x =4;
-            sprite.scale.y =4;
-            sprite.anchor.x=0.5;
-            sprite.anchor.y=0.5;
-            sprite.scale.x=sprite.scale.x*-1;
+            this.applyCommonSpriteSettings(sprite,true);
             sprite.customState= PlayerStateEnum.JUMP_LEFT;//custom field
             this.sprites[PlayerStateEnum.JUMP_LEFT].push(sprite);
 
             //rest right
             sprite = new Sprite(this.restTextures[0]);
-            sprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-            sprite.scale.x =4;
-            sprite.scale.y =4;
-            sprite.anchor.x=0.5;
-            sprite.anchor.y=0.5;
+            this.applyCommonSpriteSettings(sprite,false);
             sprite.customState= PlayerStateEnum.REST_RIGHT;//custom field
             this.sprites[PlayerStateEnum.REST_RIGHT].push(sprite);
 
             //rest left
             sprite = new Sprite(this.restTextures[0]);
-            sprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-            sprite.scale.x =4;
-            sprite.scale.y =4;
-            sprite.anchor.x=0.5;
-            sprite.anchor.y=0.5;
-            sprite.scale.x=sprite.scale.x*-1;
+            this.applyCommonSpriteSettings(sprite,true);
             sprite.customState= PlayerStateEnum.REST_LEFT;//custom field
             this.sprites[PlayerStateEnum.REST_LEFT].push(sprite);
         }
     };
 
+    /**
+     *
+     * @param sprite {PIXI.Sprite}
+     * @param flipLeft {Boolean}
+     */
+    applyCommonSpriteSettings(sprite, flipLeft=false){
+        sprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+        sprite.width = flipLeft?-1*GlobalConfig.entities.player.width:GlobalConfig.entities.player.width;
+        sprite.height = GlobalConfig.entities.player.height;
+        sprite.anchor.x=0.5;
+        sprite.anchor.y=0.5;
+    }
 }

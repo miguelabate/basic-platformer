@@ -1,6 +1,6 @@
 class BigBrickEntity {
 
-    type="BIGBRICK";
+    type=GlobalConfig.entities.bigBrick.type;
     body={};//Matter Body
     sprite=undefined;// Pixi Sprite
     existsOutsideViewPort=true;

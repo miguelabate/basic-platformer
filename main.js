@@ -23,14 +23,14 @@ let Application = PIXI.Application,
 
 let entitiesManager;
 
-let engine;
 let runner;
 
-let graphicsSystem, inputSystem, physicsSystem,maintenanceSystem, stateSystem;
+let graphicsSystem, inputSystem, physicsSystem, maintenanceSystem, stateSystem;
 
-let viewPort = new ViewPort({width:1200, height:500});
+let viewPort;
 
 let oldTime;
+let myWorldStateService;
 
 function main() {
     //Add the canvas that Pixi automatically created for you to the HTML document
@@ -42,19 +42,23 @@ function main() {
 }
 
 function setup() {
+    //global viewport set
+    viewPort = new ViewPort({width:GlobalConfig.viewport.width, height:GlobalConfig.viewport.height});
     //create entities manager
     entitiesManager = new EntitiesManager();
+    //world state service
+    myWorldStateService = new WorldStateService(entitiesManager);
 
     //create graphics system
     graphicsSystem = new GraphicsSystem( entitiesManager);
     //physics system create
-    physicsSystem = new PhysicsSystem(entitiesManager);
+    physicsSystem = new PhysicsSystem(entitiesManager, myWorldStateService);
     //input system create
-    inputSystem = new InputSystem(entitiesManager,physicsSystem.engine,viewPort);
+    inputSystem = new InputSystem(entitiesManager, myWorldStateService);
     //maintenance system
     maintenanceSystem = new MaintenanceSystem(entitiesManager);
     //state system
-    stateSystem = new StateSystem((entitiesManager));
+    stateSystem = new StateSystem(entitiesManager, myWorldStateService);
     //MatterJs stuff
     createMatterModel();
 
@@ -104,8 +108,8 @@ function createMatterModel() {
     var render = Render.create({
         element: document.body,
         options: {
-            width: 1200,
-            height: 600
+            width: GlobalConfig.viewport.width,
+            height: GlobalConfig.viewport.height
         },
         engine: physicsSystem.engine
     });
@@ -115,9 +119,9 @@ function createMatterModel() {
 
         let floor;
         if(Math.random()>0.2) {
-            floor = Bodies.rectangle(-300 + i * 64, 500, 64, 128, {isStatic: true, friction: 0}); //436
+            floor = BodyFactory.createFloorThin(-300 + i * 64,500);
         }else{
-            floor = Bodies.rectangle(-300 + i * 64, 436, 64, 128, {isStatic: true, friction: 0});
+            floor = BodyFactory.createFloorThin(-300 + i * 64,436);
         }
         let floorEntity = new FloorEntity();
         floorEntity.body = floor;
@@ -126,48 +130,36 @@ function createMatterModel() {
         World.add(physicsSystem.engine.world, floorEntity.body);
     }
     // create two boxes and a ground
-    let monster = Bodies.rectangle(600, 300, 64, 64);
-    Body.setInertia(monster, Infinity);//lock rotation for dude
     let enemyEntity = new EnemyEntity();
-    enemyEntity.body = monster;
+    enemyEntity.body =  BodyFactory.createEnemy(600, 300);;
     enemyEntity.viewPort = viewPort;
-    enemyEntity.body.customType = "ENEMY";
     enemyEntity.selfMovement = new EnemyMovementComponent();
-
+    World.add(physicsSystem.engine.world, enemyEntity.body );
     entitiesManager.addEnemyEntity(enemyEntity);
-
-    let player = Bodies.rectangle(170, 350, 72,72, { restitution: 0, friction: 0,frictionAir: 0, frictionStatic: 0});
-    Body.setInertia(player, Infinity);//lock rotation for dude
 
     //player entity
     let playerEntity = new PlayerEntity();
-    playerEntity.body = player;
+    playerEntity.body =  BodyFactory.createPlayer(170, 350);
     playerEntity.viewPort = viewPort;
-    playerEntity.body.customType ="PLAYER";
+    World.add(physicsSystem.engine.world, playerEntity.body );
     entitiesManager.addPlayerEntity(playerEntity);
 
     // bigbrick
-    let bigbrick = Bodies.rectangle(50, 300, 64, 64, { isStatic: true , friction: 0.3 });
+    let bigbrick = BodyFactory.createBigBrick(GlobalConfig.entities.bigBrick.width/2, 250);
     let bigBrickEntity = new BigBrickEntity();
     bigBrickEntity.body = bigbrick;
     bigBrickEntity.viewPort = viewPort;
-    bigBrickEntity.body.customType = "BIGBRICK";
     entitiesManager.addBigBrickEntity(bigBrickEntity);
+    World.add(physicsSystem.engine.world, bigBrickEntity.body );
 
     //some coin
     for(let i=0;i<5;i++) {
-        let coin = Bodies.rectangle(250+i*100, 300, 32, 32, {isStatic: true, isSensor: true});
-        Body.setInertia(coin, Infinity);//lock rotation for dude
         let coinEntity = new CoinEntity();
-        coinEntity.body = coin;
+        coinEntity.body =  BodyFactory.createCoin(250+i*100, 300);
         coinEntity.viewPort = viewPort;
-        coinEntity.body.customType = "COIN";
         entitiesManager.addCoinEntity(coinEntity);
-        World.add(physicsSystem.engine.world, coin);
+        World.add(physicsSystem.engine.world, coinEntity.body );
     }
-
-    // add all of the bodies to the world
-    World.add(physicsSystem.engine.world, [monster, player, bigbrick]);
 
     //engine.timing.timeScale = 0;//this pauses the engine
     // run the renderer

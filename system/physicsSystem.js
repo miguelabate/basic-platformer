@@ -4,15 +4,15 @@ class PhysicsSystem {
     engine = undefined; //matter engine
     MS_PER_UPDATE=16.666;
     lag = 0;
+    worldStateService = undefined;
 
-    constructor(entitiesmanager) {
-        this.entitiesManager = entitiesmanager;
-        // create an engine
-        this.engine = Engine.create();
-        this.engine.world.gravity.y = 1.7;
+    constructor(entitiesManager, worldStateService) {
+        this.entitiesManager = entitiesManager;
+        this.worldStateService = worldStateService;
+        this.engine = worldStateService.engine;
 
         //add engine event listener logic
-        this.bindEvents(this.entitiesManager,this.engine, this);
+        this.bindEvents(this.entitiesManager, this.engine, this);
     }
 
     update(deltaTime) {
@@ -20,35 +20,6 @@ class PhysicsSystem {
         if(this.lag > 1000){//if too much lag, pauses basically
             this.lag = 0;
             console.log("discarded time delay. Too much to catchup");
-        }
-
-        //create bullets
-        let entitiesBulletsWithoutBody = entitiesManager.getEntitiesByState(BulletStateEnum.BODY_MISSING);
-        for(let i=entitiesBulletsWithoutBody.length-1;i>=0;i--){
-            let playerEntity = this.entitiesManager.getPlayerEntities()[0];
-            let bulletBody;
-            let bulletEntity = entitiesBulletsWithoutBody[i];
-
-            if(playerEntity.bearing === "RIGHT") {
-                bulletBody = Bodies.rectangle(playerEntity.body.bounds.max.x + 50, playerEntity.body.position.y - 10, 12, 12, {
-                    restitution: 0,
-                    friction: 0,
-                    frictionAir: 0
-                });
-                bulletEntity.bearing = "RIGHT";
-            }else{
-                bulletBody = Bodies.rectangle(playerEntity.body.bounds.min.x - 50, playerEntity.body.position.y - 10, 12, 12, {
-                    restitution: 0,
-                    friction: 0,
-                    frictionAir: 0
-                });
-                bulletEntity.bearing = "LEFT";
-            }
-
-            bulletBody.customType = 'BULLET';
-            bulletEntity.body = bulletBody;
-            bulletEntity.state =  new StateComponent(GenericStateEnum.DEFAULT);//TODO: change sprite generation to use moving state
-            World.add(this.engine.world, bulletBody);
         }
 
         //update engine, catch up
@@ -91,24 +62,24 @@ class PhysicsSystem {
             let bElm = event.pairs[0].bodyB;
 
             // Event listener: collision bullet
-            if(aElm.customType=='BULLET'){
-                physicsSys.removeBulletBodyFromentitiesList(entitiesManager.getBulletEntities(), aElm.id);
+            if(aElm.customType===GlobalConfig.entities.bullet.type){
+                physicsSys.worldStateService.removeBulletBodyFromEntitiesList(aElm.id);
             }
 
-            if(bElm.customType=='BULLET'){
-                physicsSys.removeBulletBodyFromentitiesList(entitiesManager.getBulletEntities(), bElm.id);
+            if(bElm.customType===GlobalConfig.entities.bullet.type){
+                physicsSys.worldStateService.removeBulletBodyFromEntitiesList(bElm.id);
             }
 
             //collision player
-            if((aElm.customType=='ENEMY'  && bElm.customType=='PLAYER')||(bElm.customType=='ENEMY'  && aElm.customType=='PLAYER')){
+            if((aElm.customType===GlobalConfig.entities.enemy.type  && bElm.customType===GlobalConfig.entities.player.type)||(bElm.customType===GlobalConfig.entities.enemy.type  && aElm.customType===GlobalConfig.entities.player.type)){
                 console.log("YOu DIeD!");
             }
 
             //collision coin
-            if(aElm.customType==='COIN'  || bElm.customType==='COIN'){
+            if(aElm.customType===GlobalConfig.entities.coin.type  || bElm.customType===GlobalConfig.entities.coin.type){
                 let bodyId;
-                if(aElm.customType==='COIN' )bodyId=aElm.id;
-                if(bElm.customType==='COIN' )bodyId=bElm.id;
+                if(aElm.customType===GlobalConfig.entities.coin.type )bodyId=aElm.id;
+                if(bElm.customType===GlobalConfig.entities.coin.type )bodyId=bElm.id;
 
                 console.log("coin collected!");
                 let coinEntity = entitiesManager.getCoinEntityByBodyId(bodyId);
@@ -120,16 +91,6 @@ class PhysicsSystem {
         });
     }
 
-
-    removeBulletBodyFromentitiesList(listEntities, bodyId){
-        for(let i=listEntities.length-1;i>=0;i--){//move this inside bullet entity
-            if(listEntities[i].body&&listEntities[i].body.id==bodyId){
-                World.remove(this.engine.world, listEntities[i].body);
-                delete listEntities[i].body
-            }
-        }
-    }
-
     isVisible(entity) {
         if(!entity.body) return false;//if there is no body, is not visible
 
@@ -138,10 +99,10 @@ class PhysicsSystem {
         let bodyYMin = entity.body.bounds.min.y;
         let bodyYMax = entity.body.bounds.max.y;
 
-        return Matter.Bounds.contains(entity.viewPort.bounds,{x:bodyXMin,y:bodyYMin})||
-            Matter.Bounds.contains(entity.viewPort.bounds,{x:bodyXMin,y:bodyYMax})||
-            Matter.Bounds.contains(entity.viewPort.bounds,{x:bodyXMax,y:bodyYMin})||
-            Matter.Bounds.contains(entity.viewPort.bounds,{x:bodyXMax,y:bodyYMax});
+        return Matter.Bounds.contains(viewPort.bounds,{x:bodyXMin,y:bodyYMin})||
+            Matter.Bounds.contains(viewPort.bounds,{x:bodyXMin,y:bodyYMax})||
+            Matter.Bounds.contains(viewPort.bounds,{x:bodyXMax,y:bodyYMin})||
+            Matter.Bounds.contains(viewPort.bounds,{x:bodyXMax,y:bodyYMax});
     }
 
 }

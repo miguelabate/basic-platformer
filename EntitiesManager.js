@@ -76,7 +76,7 @@ class EntitiesManager {
         return  [...this.bulletEntitiesList, ...this.playerEntitiesList, ...this.enemyEntitiesList, ...this.floorEntitiesList, ...this.bigBrickEntitiesList, ...this.coinEntitiesList];
     }
 
-    /**state is a string defined in stateEnums.js**/
+    /**state is a string defined in GeneralEnums.js**/
     getEntitiesByState(state){
         let result = this.getAllEntitiesWithState().filter(e => e.state.getState() === state);//e: entity e.state: StateComponent
         if(result)

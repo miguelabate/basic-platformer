@@ -1,13 +1,11 @@
 class InputSystem {
 
-    engine = undefined;//matter engine
+    worldStateService = undefined;//worldStateService
     entitiesManager = undefined;//EntitiesManager
-    viewPort = undefined;//used to add it when creating entities
 
-    constructor(entitiesManager, engine, viewPort) {
-        this.engine = engine;
+    constructor(entitiesManager, worldStateService) {
+        this.worldStateService = worldStateService;
         this.entitiesManager = entitiesManager;
-        this.viewPort = viewPort;
 
         this.init();
     }
@@ -23,14 +21,16 @@ class InputSystem {
         this.up = this.keyboard(this,"ArrowUp", false,30);
         this.right = this.keyboard(this,"ArrowRight",true,30);
         this.left = this.keyboard(this,"ArrowLeft",true,30);
-        this.keyN = this.keyboard(this,"n",true,70);
+        this.keyN = this.keyboard(this,"n",false,50);
 
         /////UP
         ////press
         this.up.press = function(inputSys){
             let playerEntity = inputSys.entitiesManager.getPlayerEntities()[0];
-            if (playerEntity.body.velocity.y  <0.2 && playerEntity.body.velocity.y  > -0.2) //TODO: move this "events"/methods as events to some kind of queue that is handled by other systems. EG: movement evnet, create body event
+            let playerOnGround = inputSys.worldStateService.isPlayerOnTheGround();
+            if (playerOnGround) {
                 Body.setVelocity(playerEntity.body, {x: playerEntity.body.velocity.x, y: -12});
+            }
         };
 
         //release
@@ -44,7 +44,7 @@ class InputSystem {
         this.right.press = function(inputSys){
             let playerEntity = inputSys.entitiesManager.getPlayerEntities()[0];
             Body.setVelocity(playerEntity.body, {x: 4, y: playerEntity.body.velocity.y});
-            playerEntity.bearing = "RIGHT";
+            playerEntity.bearing = BearingEnum.RIGHT;
         };
 
         //release
@@ -58,7 +58,7 @@ class InputSystem {
         this.left.press = function(inputSys){
             let playerEntity = inputSys.entitiesManager.getPlayerEntities()[0];
             Body.setVelocity(playerEntity.body, {x: -4, y: playerEntity.body.velocity.y});
-            playerEntity.bearing = "LEFT";
+            playerEntity.bearing = BearingEnum.LEFT;
         };
 
         //release
@@ -72,8 +72,9 @@ class InputSystem {
         this.keyN.press = function(inputSys){
             let bulletEntity = new BulletEntity();
 
-            bulletEntity.viewPort = inputSys.viewPort;
-            bulletEntity.state = new StateComponent(BulletStateEnum.BODY_MISSING);
+            // bulletEntity.viewPort = inputSys.viewPort;
+            bulletEntity.state = new StateComponent(BulletStateEnum.MOVING);
+            inputSys.worldStateService.addBulletBodyToEntity(bulletEntity);
             inputSys.entitiesManager.addBulletEntity(bulletEntity);
 
         };

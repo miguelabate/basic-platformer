@@ -15,13 +15,12 @@ class GraphicsSystem {
     bigBrickSpritePool = undefined;
     coinSpritePool;
 
-    viewPortBuffer = 600;
     keepSlidingViewPortLeft=false;
     keepSlidingViewPortRight=false;
 
     constructor(entitiesmanager) {
         // setup renderer and stage
-        this.pixiRenderer= new PIXI.Renderer({ width: 1200, height: 500, backgroundColor: 0xA3ECEE, view: $("#secondCanv")[0],  antialiasing: true,});
+        this.pixiRenderer= new PIXI.Renderer({ width: GlobalConfig.viewport.width, height: GlobalConfig.viewport.height, backgroundColor: 0xA3ECEE, view: $("#secondCanv")[0],  antialiasing: true,});
         this.stage = new PIXI.Container();
 
         this.entitiesmanager = entitiesmanager;
@@ -43,17 +42,17 @@ class GraphicsSystem {
     }
 
     getSpritePoolFor(entity){
-        if(entity.type==="BULLET"){
+        if(entity.type===GlobalConfig.entities.bullet.type){
             return this.bulletSpritePool;
-        } else if (entity.type==="PLAYER"){
+        } else if (entity.type===GlobalConfig.entities.player.type){
             return this.playerSpritePool;
-        }  else if (entity.type==="ENEMY"){
+        }  else if (entity.type===GlobalConfig.entities.enemy.type){
             return this.enemiesSpritePool;
-        } else if (entity.type==="FLOOR"){
+        } else if (entity.type===GlobalConfig.entities.floorThin.type){
             return this.floorThinSpritePool;
-        } else if (entity.type==="BIGBRICK"){
+        } else if (entity.type===GlobalConfig.entities.bigBrick.type){
             return this.bigBrickSpritePool;
-        }else if (entity.type==="COIN"){
+        }else if (entity.type===GlobalConfig.entities.coin.type){
             return this.coinSpritePool;
         }else{
             console.log("Error fetching Sprite Pool for entity. Unrecognized type.");
@@ -97,10 +96,10 @@ class GraphicsSystem {
         /// background handling
         if (entitiesManager.getBackgroundEntities().length === 1 && !entitiesManager.getBackgroundEntities()[0].sprite) {
             let backSprite = this.backgroundSpritePool.borrowSprite();
-            backSprite.x = 0;
-            backSprite.y = 0;
+            backSprite.x = GlobalConfig.viewport.width/2;
+            backSprite.y = GlobalConfig.viewport.height/2;
             entitiesManager.getBackgroundEntities()[0].sprite = backSprite;
-            // backSprite.zIndex = 100;
+
             this.stage.addChild(backSprite);
             this.stage.setChildIndex(backSprite, 0);
         }
@@ -109,16 +108,16 @@ class GraphicsSystem {
         let playerX = entitiesManager.getPlayerEntities()[0].body.position.x;
         let playerY = entitiesManager.getPlayerEntities()[0].body.position.y;
         //for now only check center visibility
-        if ((playerX < viewPort.offset.x + 200)||this.keepSlidingViewPortLeft) {//have two vars, one slide left one slide right
+        if ((playerX < viewPort.offset.x +  GlobalConfig.viewport.borderLimit)||this.keepSlidingViewPortLeft) {//have two vars, one slide left one slide right
             this.keepSlidingViewPortLeft=true;
-            viewPort.offset.x -= 3;
-            entitiesManager.getBackgroundEntities()[0].sprite.tilePosition.x += 0.128; //background move, just for test
-            if(playerX > viewPort.offset.x + this.viewPortBuffer)  this.keepSlidingViewPortLeft=false;
-        } else if ((playerX > viewPort.offset.x + viewPort.size.width - 200)||this.keepSlidingViewPortRight) {
+            viewPort.offset.x -= GlobalConfig.viewport.foreGroundSpeed;;
+            entitiesManager.getBackgroundEntities()[0].sprite.tilePosition.x += GlobalConfig.viewport.backgroundSpeed;
+            if(playerX > viewPort.offset.x + GlobalConfig.viewport.stride)  this.keepSlidingViewPortLeft=false;
+        } else if ((playerX > viewPort.offset.x + viewPort.size.width - GlobalConfig.viewport.borderLimit)||this.keepSlidingViewPortRight) {
             this.keepSlidingViewPortRight=true;
-            viewPort.offset.x += 3;
-            entitiesManager.getBackgroundEntities()[0].sprite.tilePosition.x -= 0.128; //background move, just for test
-            if( viewPort.offset.x + viewPort.size.width-playerX > this.viewPortBuffer) {
+            viewPort.offset.x += GlobalConfig.viewport.foreGroundSpeed;
+            entitiesManager.getBackgroundEntities()[0].sprite.tilePosition.x -= GlobalConfig.viewport.backgroundSpeed;
+            if( viewPort.offset.x + viewPort.size.width-playerX > GlobalConfig.viewport.stride) {
                 this.keepSlidingViewPortRight=false;
             }
         }    //&& playerY  > viewPort.offset.y && playerY < viewPort.offset.y+viewPort.size.height;
@@ -136,9 +135,9 @@ class GraphicsSystem {
         let bodyYMin = entity.body.bounds.min.y;
         let bodyYMax = entity.body.bounds.max.y;
 
-        return Matter.Bounds.contains(entity.viewPort.bounds,{x:bodyXMin,y:bodyYMin})||
-            Matter.Bounds.contains(entity.viewPort.bounds,{x:bodyXMin,y:bodyYMax})||
-            Matter.Bounds.contains(entity.viewPort.bounds,{x:bodyXMax,y:bodyYMin})||
-            Matter.Bounds.contains(entity.viewPort.bounds,{x:bodyXMax,y:bodyYMax});
+        return Matter.Bounds.contains(viewPort.bounds,{x:bodyXMin,y:bodyYMin})||
+            Matter.Bounds.contains(viewPort.bounds,{x:bodyXMin,y:bodyYMax})||
+            Matter.Bounds.contains(viewPort.bounds,{x:bodyXMax,y:bodyYMin})||
+            Matter.Bounds.contains(viewPort.bounds,{x:bodyXMax,y:bodyYMax});
     }
 }

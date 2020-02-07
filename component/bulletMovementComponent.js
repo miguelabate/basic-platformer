@@ -3,10 +3,10 @@ class BulletMovementComponent {
     move(entity, engine) {
         let gravity = engine.world.gravity;
         if (entity.body) {
-            if(entity.bearing==="RIGHT") {
-                Body.setVelocity(entity.body, {x: 6, y: 0});
+            if(entity.bearing===BearingEnum.RIGHT) {
+                Body.setVelocity(entity.body, {x: GlobalConfig.physics.bulletSpeed, y: 0});
             }else{
-                Body.setVelocity(entity.body, {x: -6, y: 0});
+                Body.setVelocity(entity.body, {x: -GlobalConfig.physics.bulletSpeed, y: 0});
             }
             //disalbe gravity
             Body.applyForce(entity.body, entity.body.position, {

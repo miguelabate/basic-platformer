@@ -1,28 +1,31 @@
 class StateSystem {
 
     entitiesManager = undefined;//entities manager
+    worldStateService = undefined;//worldStateService
 
-    constructor(entitiesmanager) {
-        this.entitiesManager = entitiesmanager;
+    constructor(entitiesManager, worldStateService) {
+        this.entitiesManager = entitiesManager;
+        this.worldStateService = worldStateService;
     }
 
     update() {
+        let isPlayerOnTheGround = this.worldStateService.isPlayerOnTheGround();
+
         //player
         let playerEntity = this.entitiesManager.getPlayerEntities()[0];
-        if(playerEntity.bearing === "RIGHT") {
-            if (playerEntity.body.velocity.y < -0.1 || playerEntity.body.velocity.y > 0.1) {
+        if(playerEntity.bearing === BearingEnum.RIGHT) {
+            if (!isPlayerOnTheGround){
                 playerEntity.state.setState(PlayerStateEnum.JUMP_RIGHT);
-            } else if (playerEntity.body.velocity.y > -0.5 && playerEntity.body.velocity.y < 0.5) {
+            } else {
                 if(playerEntity.body.velocity.x > 0.5)
                     playerEntity.state.setState(PlayerStateEnum.MOVE_RIGHT);
                 else
                     playerEntity.state.setState(PlayerStateEnum.REST_RIGHT);
             }
         }else {//LEFT bearing
-
-            if (playerEntity.body.velocity.y < -0.1 || playerEntity.body.velocity.y > 0.1) {
+            if (!isPlayerOnTheGround){
                 playerEntity.state.setState( PlayerStateEnum.JUMP_LEFT);
-            } else if (playerEntity.body.velocity.y > -0.5 && playerEntity.body.velocity.y < 0.5) {
+            } else{
                 if(playerEntity.body.velocity.x < -0.5)
                     playerEntity.state.setState( PlayerStateEnum.MOVE_LEFT);
                 else

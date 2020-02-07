@@ -1,6 +1,6 @@
 class EnemyEntity {
 
-    type = "ENEMY";
+    type = GlobalConfig.entities.enemy.type;
     body = undefined;//Matter Body
     sprite = undefined;// Pixi Sprite
     existsOutsideViewPort = true;

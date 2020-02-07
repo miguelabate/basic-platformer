@@ -13,8 +13,8 @@ class EnemySpritesPool extends SpritePool {
             sprite.animationSpeed = 0.2;
             sprite.play();
             sprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-            sprite.width=64;
-            sprite.height=64;
+            sprite.width=GlobalConfig.entities.enemy.width;
+            sprite.height=GlobalConfig.entities.enemy.height;
             sprite.anchor.x=0.5;
             sprite.anchor.y=0.5;
             sprite.customState= GenericStateEnum.DEFAULT;//custom field

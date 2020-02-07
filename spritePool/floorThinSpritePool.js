@@ -10,8 +10,8 @@ class FloorThinSpritesPool extends SpritePool {
         {
             let sprite = new Sprite(resources[resourceId].spritesheet.textures["ground-thin.png"]);
             sprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-            sprite.scale.x =4
-            sprite.scale.y =4
+            sprite.width =GlobalConfig.entities.floorThin.width;
+            sprite.height =GlobalConfig.entities.floorThin.height;
             sprite.anchor.x=0.5;
             sprite.anchor.y=0.5;
             sprite.customState= GenericStateEnum.DEFAULT;//custom field
