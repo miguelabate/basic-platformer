@@ -5,6 +5,7 @@ class EntitiesManager {
     enemyEntitiesList=[];//sprite, body, selfmovement,viewPort
     backgroundEntitiesList=[];//sprite
     floorEntitiesList = [];//sprite, body, viewPort
+    floorWTreeEntitiesList = [];//sprite, body, viewPort
     bigBrickEntitiesList = [];//sprite, body, viewPort
     coinEntitiesList = [];//sprite, body, viewPort
 
@@ -46,10 +47,31 @@ class EntitiesManager {
             }
         }
     }
+
+    getBulletEntityByBodyId(bodyId) {
+        return this._getFromListByBodyId(bodyId, this.bulletEntitiesList);
+    }
+
+    getEnemyEntityByBodyId(bodyId) {
+        return this._getFromListByBodyId(bodyId, this.enemyEntitiesList);
+    }
+
+    getPlayerEntityByBodyId(bodyId) {
+        return this._getFromListByBodyId(bodyId, this.playerEntitiesList);//trivial because it's on ly one player
+    }
+
+    //internal use
+    _getFromListByBodyId(bodyId, entityWithBodyList){
+        for(let i=0;entityWithBodyList.length>i;i++) {
+            if(entityWithBodyList[i].body  && entityWithBodyList[i].body.id === bodyId){
+                return entityWithBodyList[i];
+            }
+        }
+    }
     ///////////////////// SPECIAL GETS: GROUPING ///////////////////////
 
     getEntitiesWithSpriteAndBodyComponent(){
-        return  [...this.bulletEntitiesList, ...this.playerEntitiesList, ...this.enemyEntitiesList, ...this.floorEntitiesList, ...this.bigBrickEntitiesList, ...this.coinEntitiesList];
+        return  [...this.bulletEntitiesList, ...this.playerEntitiesList, ...this.enemyEntitiesList, ...this.floorEntitiesList, ...this.floorWTreeEntitiesList, ...this.bigBrickEntitiesList, ...this.coinEntitiesList];
     }
 
     getEntitiesWithSelfMovementAndBodyComponent(){
@@ -60,20 +82,16 @@ class EntitiesManager {
         return  [...this.bulletEntitiesList];
     }
 
-    getEntitiesWithViewPort(){
-        return  [...this.bulletEntitiesList, ...this.playerEntitiesList, ...this.enemyEntitiesList, ...this.floorEntitiesList, ...this.bigBrickEntitiesList, ...this.coinEntitiesList];
-    }
-
     getEntitiesWithViewPortAndState(){
-        return  [...this.bulletEntitiesList, ...this.playerEntitiesList, ...this.enemyEntitiesList, ...this.floorEntitiesList, ...this.bigBrickEntitiesList, ...this.coinEntitiesList];
+        return  [...this.bulletEntitiesList, ...this.playerEntitiesList, ...this.enemyEntitiesList, ...this.floorEntitiesList, ...this.floorWTreeEntitiesList, ...this.bigBrickEntitiesList, ...this.coinEntitiesList];
     }
 
     getEntitiesWithState() {
-        return [...this.playerEntitiesList, ...this.enemyEntitiesList, ...this.floorEntitiesList, ...this.bigBrickEntitiesList, ...this.coinEntitiesList];
+        return [...this.playerEntitiesList, ...this.enemyEntitiesList, ...this.floorEntitiesList, ...this.floorWTreeEntitiesList, ...this.bigBrickEntitiesList, ...this.coinEntitiesList];
     }
 
     getAllEntitiesWithState(){
-        return  [...this.bulletEntitiesList, ...this.playerEntitiesList, ...this.enemyEntitiesList, ...this.floorEntitiesList, ...this.bigBrickEntitiesList, ...this.coinEntitiesList];
+        return  [...this.bulletEntitiesList, ...this.playerEntitiesList, ...this.enemyEntitiesList, ...this.floorEntitiesList, ...this.floorWTreeEntitiesList, ...this.bigBrickEntitiesList, ...this.coinEntitiesList];
     }
 
     /**state is a string defined in GeneralEnums.js**/
@@ -106,6 +124,9 @@ class EntitiesManager {
     addFloorEntity(floorEntity){
         this.floorEntitiesList.push(floorEntity);
     }
+    addFloorWTreeEntity(floorWTreeEntity){
+        this.floorWTreeEntitiesList.push(floorWTreeEntity);
+    }
 
     addBigBrickEntity(bigBrickEntity){
         this.bigBrickEntitiesList.push(bigBrickEntity);
@@ -122,6 +143,7 @@ class EntitiesManager {
         this.removeEntitiesWithoutBodyAndSpriteAndToRemoveFrom(this.playerEntitiesList);
         this.removeEntitiesWithoutBodyAndSpriteAndToRemoveFrom(this.enemyEntitiesList);
         this.removeEntitiesWithoutBodyAndSpriteAndToRemoveFrom(this.floorEntitiesList);
+        this.removeEntitiesWithoutBodyAndSpriteAndToRemoveFrom(this.floorWTreeEntitiesList);
         this.removeEntitiesWithoutBodyAndSpriteAndToRemoveFrom(this.bigBrickEntitiesList);
         this.removeEntitiesWithoutBodyAndSpriteAndToRemoveFrom(this.coinEntitiesList);
     }

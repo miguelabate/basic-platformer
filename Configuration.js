@@ -50,3 +50,14 @@ GlobalConfig.entities.background = {
     width:GlobalConfig.viewport.width,
     height:GlobalConfig.viewport.height
 };
+GlobalConfig.entities.floorWTree = {
+    type:"FLOOR_TREE",
+    width:192,
+    height:244,
+    body:{
+        width:192,
+        height:64,
+        relX:96,
+        relY:212
+    }
+};

@@ -25,12 +25,12 @@ let entitiesManager;
 
 let runner;
 
-let graphicsSystem, inputSystem, physicsSystem, maintenanceSystem, stateSystem;
+let graphicsSystem, inputSystem, physicsSystem, maintenanceSystem, stateSystem, conditionCheckSystem;
 
 let viewPort;
 
 let oldTime;
-let myWorldStateService;
+let myWorldStateService, myGameStateService;
 
 function main() {
     //Add the canvas that Pixi automatically created for you to the HTML document
@@ -48,6 +48,8 @@ function setup() {
     entitiesManager = new EntitiesManager();
     //world state service
     myWorldStateService = new WorldStateService(entitiesManager);
+    //world state service
+    myGameStateService = new GameStateService();
 
     //create graphics system
     graphicsSystem = new GraphicsSystem( entitiesManager);
@@ -59,6 +61,8 @@ function setup() {
     maintenanceSystem = new MaintenanceSystem(entitiesManager);
     //state system
     stateSystem = new StateSystem(entitiesManager, myWorldStateService);
+    //condition check system
+    conditionCheckSystem = new ConditionCheckSystem(entitiesManager, myWorldStateService, myGameStateService)
     //MatterJs stuff
     createMatterModel();
 
@@ -71,6 +75,9 @@ function setup() {
 }
 
 function gameLoop(delta) {
+
+    if(!myGameStateService.getGameIsPlaying()) return;//game ended
+
     let newTime = performance.now();
     let deltaTime = newTime - oldTime;
     oldTime = newTime;
@@ -84,6 +91,8 @@ function gameLoop(delta) {
 
     //update graphics and render
     graphicsSystem.update();
+
+    conditionCheckSystem.update();
 
     //clean up stuff
     maintenanceSystem.update();
@@ -114,8 +123,16 @@ function createMatterModel() {
         engine: physicsSystem.engine
     });
 
+    //floor w tree
+    let floorWTreeBody = BodyFactory.createFloorWTree(404,468);
+    let floorWTreeEntity = new FloorWTreeEntity();
+    floorWTreeEntity.body = floorWTreeBody;
+    floorWTreeEntity.viewPort = viewPort;
+    entitiesManager.addFloorWTreeEntity(floorWTreeEntity);
+    World.add(physicsSystem.engine.world, floorWTreeEntity.body);
+
     //dynamic floor
-    for(let i=0;i<50;i++) {
+    for(let i=0;i<10;i++) {
 
         let floor;
         if(Math.random()>0.2) {
@@ -129,13 +146,16 @@ function createMatterModel() {
         entitiesManager.addFloorEntity(floorEntity);
         World.add(physicsSystem.engine.world, floorEntity.body);
     }
-    // create two boxes and a ground
-    let enemyEntity = new EnemyEntity();
-    enemyEntity.body =  BodyFactory.createEnemy(600, 300);;
-    enemyEntity.viewPort = viewPort;
-    enemyEntity.selfMovement = new EnemyMovementComponent();
-    World.add(physicsSystem.engine.world, enemyEntity.body );
-    entitiesManager.addEnemyEntity(enemyEntity);
+    // eney entity spawner
+    setInterval(function(){
+        let enemyEntity = new EnemyEntity();
+        enemyEntity.body =  BodyFactory.createEnemy(600, 100);;
+        enemyEntity.viewPort = viewPort;
+        enemyEntity.selfMovement = new EnemyMovementComponent();
+        World.add(physicsSystem.engine.world, enemyEntity.body );
+        entitiesManager.addEnemyEntity(enemyEntity);
+        }, 4000);
+
 
     //player entity
     let playerEntity = new PlayerEntity();

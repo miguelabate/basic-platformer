@@ -21,7 +21,7 @@ class PlayerSpritesPool extends SpritePool {
     }
 
     addPlayerSprites(amount) {
-        for (var i = 0; i < amount; i++)
+        for (let i = 0; i < amount; i++)
         {
             //left
             let  sprite = new PIXI.AnimatedSprite(this.walkingTextures);

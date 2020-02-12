@@ -5,8 +5,7 @@ class EnemyEntity {
     sprite = undefined;// Pixi Sprite
     existsOutsideViewPort = true;
     selfMovement = undefined;
-    viewPort=undefined;
-    state=new StateComponent(GenericStateEnum.DEFAULT);
+    state=new StateComponent(EnemyStateEnum.MOVE_RIGHT);
 
     constructor() {
     }

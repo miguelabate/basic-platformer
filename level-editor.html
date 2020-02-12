@@ -57,8 +57,33 @@
     <script src="WorldStateService.js"></script>
     <script src="BodyFactory.js"></script>
     <script src="Configuration.js"></script>
-    <script src="main.js"></script>
+    <script src="main-lvl-editor.js"></script>
 
-    <canvas id="secondCanv" width="800" height="600" style="background:  0% 0% / contain rgb(180, 180, 224);"></canvas>
+    <canvas id="secondCanv" width="800" height="600" style="background:  0% 0% / contain rgb(180, 180, 224);"></canvas><br><br>
+
+  <label for="worldxInput">World X:</label>
+  <input type="text" id="worldxInput" name="worldxInput"><br><br>
+
+  <label for="worldyInput">World Y:</label>
+  <input type="text" id="worldyInput" name="worldyInput"><br><br>
+
+  <label for="typeInput">Choose a sprite type (press C to add to scene):</label>
+  <select id="typeInput">
+    <option value="BACKGROUND">back</option>
+    <option value="PLAYER">player</option>
+    <option value="FLOOR">floorThin</option>
+    <option value="FLOOR_TREE">floorWTree</option>
+    <option value="COIN">coin</option>
+    <option value="ENEMY">enemy</option>
+    <option value="BIGBRICK">bigBrick</option>
+  </select>
+  <br><br>
+  <button type="button" id="moveBackBtn" onclick="onSendBackButtonClick()">Send sprite back</button>
+  <br><br>
+  <button type="button" id="exportBtn" onclick="onExportButtonClick()">Export scene</button>
+  <br><br>
+  <input id="file-input-import" type="file" name="file-input-import" />
+  <br><br>
+  <button type="button" id="importBtn" onclick="onImportButtonClick()">Import scene</button>
   </body>
 </html>

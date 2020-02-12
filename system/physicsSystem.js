@@ -32,8 +32,7 @@ class PhysicsSystem {
         let entities = entitiesManager.getEntitiesThatDoNotExistsOutsideViewPort();
         for(let i=entities.length-1;i>=0;i--){
             if(!this.isVisible(entities[i])&& entities[i].body) {
-                World.remove(this.engine.world, entities[i].body);
-                delete entities[i].body;
+                entities[i].state.setState(GenericStateEnum.TO_REMOVE);
             }
         }
 
@@ -43,6 +42,7 @@ class PhysicsSystem {
             World.remove(this.engine.world, entities[i].body);
             delete entities[i].body;
         }
+
     }
 
     bindEvents(entitiesManager, engine, physicsSys)  {
@@ -57,40 +57,86 @@ class PhysicsSystem {
 
         //collisionStart
         Matter.Events.on(this.engine, 'collisionStart', function(event) {//collisionEnd
-            // We know there was a collision so fetch involved elements ...
-            let aElm = event.pairs[0].bodyA;
-            let bElm = event.pairs[0].bodyB;
-
-            // Event listener: collision bullet
-            if(aElm.customType===GlobalConfig.entities.bullet.type){
-                physicsSys.worldStateService.removeBulletBodyFromEntitiesList(aElm.id);
-            }
-
-            if(bElm.customType===GlobalConfig.entities.bullet.type){
-                physicsSys.worldStateService.removeBulletBodyFromEntitiesList(bElm.id);
-            }
-
-            //collision player
-            if((aElm.customType===GlobalConfig.entities.enemy.type  && bElm.customType===GlobalConfig.entities.player.type)||(bElm.customType===GlobalConfig.entities.enemy.type  && aElm.customType===GlobalConfig.entities.player.type)){
-                console.log("YOu DIeD!");
-            }
-
-            //collision coin
-            if(aElm.customType===GlobalConfig.entities.coin.type  || bElm.customType===GlobalConfig.entities.coin.type){
-                let bodyId;
-                if(aElm.customType===GlobalConfig.entities.coin.type )bodyId=aElm.id;
-                if(bElm.customType===GlobalConfig.entities.coin.type )bodyId=bElm.id;
-
-                console.log("coin collected!");
-                let coinEntity = entitiesManager.getCoinEntityByBodyId(bodyId);
-                if(coinEntity!==undefined) {
-                    if(coinEntity.state.getState()!== GenericStateEnum.TO_REMOVE)
-                        coinEntity.state.setState(CoinStateEnum.DISAPPEAR);
-                }
-            }
+            physicsSys.collisionStartHandler(event);
         });
     }
 
+    collisionStartHandler(event) {
+        // We know there was a collision so fetch involved elements ...
+        let aElm = event.pairs[0].bodyA;
+        let bElm = event.pairs[0].bodyB;
+
+        if(this.isCollisionBetweenTwoTypes(aElm, bElm,GlobalConfig.entities.bullet.type, GlobalConfig.entities.enemy.type)) {
+            this.handleCollisionBetweenBulletAndEnemy(aElm, bElm);
+
+        } else if (this.isCollisionBetweenTypeAndAny(aElm, bElm,GlobalConfig.entities.bullet.type)){
+            this.handleCollisionBetweenBulletAndAnything(aElm, bElm);
+        }
+
+        //collision player/enemy
+        if(this.isCollisionBetweenTwoTypes(aElm, bElm,GlobalConfig.entities.player.type, GlobalConfig.entities.enemy.type)) {
+            this.handleCollisionBetweenPlayerAndEnemy(aElm,bElm);
+        }
+
+        //collision coin
+        if(aElm.customType===GlobalConfig.entities.coin.type  || bElm.customType===GlobalConfig.entities.coin.type){
+            let bodyId;
+            if(aElm.customType===GlobalConfig.entities.coin.type )bodyId=aElm.id;
+            if(bElm.customType===GlobalConfig.entities.coin.type )bodyId=bElm.id;
+
+            console.log("coin collected!");
+            let coinEntity = entitiesManager.getCoinEntityByBodyId(bodyId);
+            if(coinEntity!==undefined) {
+                if(coinEntity.state.getState()!== GenericStateEnum.TO_REMOVE)
+                    coinEntity.state.setState(CoinStateEnum.DISAPPEAR);
+            }
+        }
+    }
+
+    handleCollisionBetweenBulletAndAnything(aElm, bElm) {
+        console.log("Bullet Missed!");
+        //    physicsSys.worldStateService.removeBulletBodyFromEntitiesList(physicsSys.getIdOfType(aElm, bElm, GlobalConfig.entities.bullet.type));
+        let bulletEntity = entitiesManager.getBulletEntityByBodyId(this.getIdOfType(aElm, bElm, GlobalConfig.entities.bullet.type));
+        bulletEntity.state.setState(GenericStateEnum.TO_REMOVE);
+    }
+
+    handleCollisionBetweenBulletAndEnemy(aElm, bElm) {
+        console.log("Killed Enemy!");
+        // mark bullet to be removed
+        let bulletEntity = entitiesManager.getBulletEntityByBodyId(this.getIdOfType(aElm, bElm, GlobalConfig.entities.bullet.type));
+        bulletEntity.state.setState(GenericStateEnum.TO_REMOVE);
+        //state of th enemy to start dying. set filter so it doesnt interfere
+        let enemyEntity = entitiesManager.getEnemyEntityByBodyId(this.getIdOfType(aElm, bElm, GlobalConfig.entities.enemy.type));
+        enemyEntity.state.setState(EnemyStateEnum.DISAPPEAR);
+        enemyEntity.body.collisionFilter.mask = ~(CategoriesFilter.COIN | CategoriesFilter.PLAYER | CategoriesFilter.BULLET);
+    }
+
+    handleCollisionBetweenPlayerAndEnemy(aElm, bElm) {
+        console.log("YOu were hit!");
+        // mark bullet to be removed
+        let playerEntity = entitiesManager.getPlayerEntityByBodyId(this.getIdOfType(aElm, bElm, GlobalConfig.entities.player.type));
+        playerEntity.health.decreaseHealth(10);
+
+    }
+
+    isCollisionBetweenTwoTypes(aElm, bElm, type1, type2) {
+        return (aElm.customType===type1 && bElm.customType===type2)||(bElm.customType===type1 && aElm.customType===type2);
+    }
+
+    isCollisionBetweenTypeAndAny(aElm, bElm, type) {
+        return aElm.customType===type||bElm.customType===type;
+    }
+
+
+    getIdOfType(aElm, bElm, type){
+        if(aElm.customType === type){
+            return aElm.id;
+        } else if(bElm.customType === type){
+            return  bElm.id;
+        } else {
+            return undefined;
+        }
+    }
     isVisible(entity) {
         if(!entity.body) return false;//if there is no body, is not visible
 

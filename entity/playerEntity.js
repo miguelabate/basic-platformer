@@ -4,9 +4,9 @@ class PlayerEntity {
     body={};//Matter Body
     sprite=undefined;// Pixi Sprite
     existsOutsideViewPort=true;
-    viewPort=undefined;
     state= new StateComponent(PlayerStateEnum.REST_RIGHT);
     bearing=BearingEnum.RIGHT;
+    health = new HealthComponent(100);
 
     constructor() {
     }

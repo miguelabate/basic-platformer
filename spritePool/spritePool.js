@@ -4,8 +4,8 @@ class SpritePool {
         this.sprites = {"DEFAULT":[]};
     }
     borrowSprite() {
-        console.log("borrowed sprite DEFAULT");
-        console.log("pool size DEFAULT: "+this.sprites["DEFAULT"].length);
+        // console.log("borrowed sprite DEFAULT");
+        // console.log("pool size DEFAULT: "+this.sprites["DEFAULT"].length);
         let spriteToReturn = this.sprites["DEFAULT"].shift();
         if(spriteToReturn instanceof PIXI.AnimatedSprite){
             spriteToReturn.play();
@@ -14,8 +14,8 @@ class SpritePool {
     };
 
     borrowSpriteWithState(state) {
-        console.log("borrowed sprite fro state: "+state);
-        console.log("pool size: "+this.sprites[state].length);
+        // console.log("borrowed sprite fro state: "+state);
+        // console.log("pool size: "+this.sprites[state].length);
         let spriteToReturn = this.sprites[state].shift();
         if(spriteToReturn instanceof PIXI.AnimatedSprite){
             spriteToReturn.play();
@@ -24,14 +24,14 @@ class SpritePool {
     };
 
     returnSprite(sprite) {
-        console.log("returned sprite  DEFAULT");
-        this.sprites["DEFAULT"].push(sprite);
+        // console.log("returned sprite  DEFAULT");
+        // this.sprites["DEFAULT"].push(sprite);
         if(sprite instanceof PIXI.AnimatedSprite){
             sprite.stop();
         }
     };
     returnSpriteWithState(sprite, state) {
-        console.log("returned sprite");
+        // console.log("returned sprite");
         this.sprites[state].push(sprite);
         if(sprite instanceof PIXI.AnimatedSprite){
             sprite.stop();

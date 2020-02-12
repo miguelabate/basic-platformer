@@ -42,7 +42,15 @@ class StateSystem {
                 }
             }
         }
-
+        //enemies
+        let enemyEntityList = this.entitiesManager.getEnemyEntities();
+        for(let i=0;enemyEntityList.length>i;i++) {
+            if (enemyEntityList[i].state.getState() === EnemyStateEnum.DISAPPEAR) {
+                if (performance.now() - enemyEntityList[i].state.getTimeChanged() > 400) {
+                    enemyEntityList[i].state.setState(GenericStateEnum.TO_REMOVE);
+                }
+            }
+        }
     }
 
 }

@@ -9,6 +9,7 @@ class StateComponent {
     }
 
     setState(state){
+        if(this._state === state) return;//if itś already set, do not reset timer
         this._state = state;
         this._timeChanged = performance.now();
     }

@@ -1,6 +1,6 @@
-class FloorEntity {
+class FloorWTreeEntity {
 
-    type=GlobalConfig.entities.floorThin.type;
+    type=GlobalConfig.entities.floorWTree.type;
     body={};//Matter Body
     sprite=undefined;// Pixi Sprite
     existsOutsideViewPort=true;

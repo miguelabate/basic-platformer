@@ -39,6 +39,8 @@ class GraphicsSystem {
         this.bigBrickSpritePool = new BigBrickSpritesPool();
         //coin sprites pool
         this.coinSpritePool = new CoinSpritesPool();
+        //coin sprites pool
+        this.floorWTreeSpritePool = new FloorWTreeSpritesPool();
     }
 
     getSpritePoolFor(entity){
@@ -54,13 +56,15 @@ class GraphicsSystem {
             return this.bigBrickSpritePool;
         }else if (entity.type===GlobalConfig.entities.coin.type){
             return this.coinSpritePool;
+        }else if (entity.type===GlobalConfig.entities.floorWTree.type){
+            return this.floorWTreeSpritePool;
         }else{
             console.log("Error fetching Sprite Pool for entity. Unrecognized type.");
         }
     }
 
     update() {
-        //iterate enttities with body and sprite component, decide if need to draw them
+        //iterate entities with body and sprite component, decide if need to draw them
         let entities = this.entitiesmanager.getEntitiesWithViewPortAndState();
         if (entities) {//needs to be there before doing anything
             for (let i = 0; i < entities.length; i++) {
