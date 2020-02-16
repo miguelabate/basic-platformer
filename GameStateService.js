@@ -1,7 +1,7 @@
 /**
  * Singleton service that maintains the state of the game
  */
-class GameStateService {
+export class GameStateService {
 
     _gameIsPlaying = true;
 

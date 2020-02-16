@@ -1,4 +1,6 @@
-class StateSystem {
+import {BearingEnum, CoinStateEnum, EnemyStateEnum, GenericStateEnum, PlayerStateEnum} from "../GeneralEnums.js";
+
+export class StateSystem {
 
     entitiesManager = undefined;//entities manager
     worldStateService = undefined;//worldStateService

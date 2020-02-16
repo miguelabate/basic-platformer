@@ -1,7 +1,18 @@
+import {viewPort} from '../main.js';
+import {GlobalConfig} from "../Configuration.js";
+import {BulletSpritesPool} from "../spritePool/bulletSpritePool.js";
+import {PlayerSpritesPool} from "../spritePool/playerSpritePool.js";
+import {EnemySpritesPool} from "../spritePool/enemySpritePool.js";
+import {BackgroundSpritesPool} from "../spritePool/backgroundSpritePool.js";
+import {FloorThinSpritesPool} from "../spritePool/floorThinSpritePool.js";
+import {BigBrickSpritesPool} from "../spritePool/bigBrickSpritePool.js";
+import {CoinSpritesPool} from "../spritePool/coinSpritePool.js";
+import {FloorWTreeSpritesPool} from "../spritePool/FloorWTreeSpritePool.js";
+import {GenericStateEnum} from "../GeneralEnums.js";
 /**
  * System that deals with sprites components. As other systems, READS/WRITES on sprites components but can only READ on other COMPONENT types
  */
-class GraphicsSystem {
+export class GraphicsSystem {
 
     stage = undefined;//pixi stage
     pixiRenderer = undefined;
@@ -30,17 +41,17 @@ class GraphicsSystem {
         //bullet sprite pool init
         this.playerSpritePool =  new PlayerSpritesPool();
         //enemy sprite pool init
-        this.enemiesSpritePool =  new EnemySpritesPool();
+        this.enemiesSpritePool =  new EnemySpritesPool(30);
         //background sprites pool
         this.backgroundSpritePool = new BackgroundSpritesPool();
         //background sprites pool
         this.floorThinSpritePool = new FloorThinSpritesPool();
         //bigbrick sprites pool
-        this.bigBrickSpritePool = new BigBrickSpritesPool();
+        this.bigBrickSpritePool = new BigBrickSpritesPool(30);
         //coin sprites pool
-        this.coinSpritePool = new CoinSpritesPool();
+        this.coinSpritePool = new CoinSpritesPool(100);
         //coin sprites pool
-        this.floorWTreeSpritePool = new FloorWTreeSpritesPool();
+        this.floorWTreeSpritePool = new FloorWTreeSpritesPool(10);
     }
 
     getSpritePoolFor(entity){
@@ -98,29 +109,29 @@ class GraphicsSystem {
         }
 
         /// background handling
-        if (entitiesManager.getBackgroundEntities().length === 1 && !entitiesManager.getBackgroundEntities()[0].sprite) {
+        if (this.entitiesmanager.getBackgroundEntities().length === 1 && !this.entitiesmanager.getBackgroundEntities()[0].sprite) {
             let backSprite = this.backgroundSpritePool.borrowSprite();
             backSprite.x = GlobalConfig.viewport.width/2;
             backSprite.y = GlobalConfig.viewport.height/2;
-            entitiesManager.getBackgroundEntities()[0].sprite = backSprite;
+            this.entitiesmanager.getBackgroundEntities()[0].sprite = backSprite;
 
             this.stage.addChild(backSprite);
             this.stage.setChildIndex(backSprite, 0);
         }
 
         //move camera to follow player
-        let playerX = entitiesManager.getPlayerEntities()[0].body.position.x;
-        let playerY = entitiesManager.getPlayerEntities()[0].body.position.y;
+        let playerX = this.entitiesmanager.getPlayerEntities()[0].body.position.x;
+        let playerY = this.entitiesmanager.getPlayerEntities()[0].body.position.y;
         //for now only check center visibility
         if ((playerX < viewPort.offset.x +  GlobalConfig.viewport.borderLimit)||this.keepSlidingViewPortLeft) {//have two vars, one slide left one slide right
             this.keepSlidingViewPortLeft=true;
             viewPort.offset.x -= GlobalConfig.viewport.foreGroundSpeed;;
-            entitiesManager.getBackgroundEntities()[0].sprite.tilePosition.x += GlobalConfig.viewport.backgroundSpeed;
+            this.entitiesmanager.getBackgroundEntities()[0].sprite.tilePosition.x += GlobalConfig.viewport.backgroundSpeed;
             if(playerX > viewPort.offset.x + GlobalConfig.viewport.stride)  this.keepSlidingViewPortLeft=false;
         } else if ((playerX > viewPort.offset.x + viewPort.size.width - GlobalConfig.viewport.borderLimit)||this.keepSlidingViewPortRight) {
             this.keepSlidingViewPortRight=true;
             viewPort.offset.x += GlobalConfig.viewport.foreGroundSpeed;
-            entitiesManager.getBackgroundEntities()[0].sprite.tilePosition.x -= GlobalConfig.viewport.backgroundSpeed;
+            this.entitiesmanager.getBackgroundEntities()[0].sprite.tilePosition.x -= GlobalConfig.viewport.backgroundSpeed;
             if( viewPort.offset.x + viewPort.size.width-playerX > GlobalConfig.viewport.stride) {
                 this.keepSlidingViewPortRight=false;
             }

@@ -2,9 +2,9 @@
 <html lang="en">
   <head>
     <script src="js/jquery.js"></script>
-    <script src="js/pixi.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.2.1/pixi.js"></script>
     <!-- Matter -->
-    <script src="js/matter.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.14.2/matter.js"></script>
 
     <style type="text/css">
       * {
@@ -18,46 +18,7 @@
     </style>
   </head>
   <body>
-  <script src="spritePool/spritePool.js"></script>
-  <script src="spritePool/bulletSpritePool.js"></script>
-    <script src="spritePool/playerSpritePool.js"></script>
-    <script src="spritePool/backgroundSpritePool.js"></script>
-    <script src="spritePool/enemySpritePool.js"></script>
-    <script src="spritePool/floorThinSpritePool.js"></script>
-    <script src="spritePool/bigBrickSpritePool.js"></script>
-    <script src="spritePool/coinSpritePool.js"></script>
-    <script src="spritePool/FloorWTreeSpritePool.js"></script>
-
-    <script src="EntitiesManager.js"></script>
-    <script src="ViewPort.js"></script>
-
-    <script src="entity/bulletEntity.js"></script>
-    <script src="entity/playerEntity.js"></script>
-    <script src="entity/enemyEntity.js"></script>
-    <script src="entity/backgroundEntity.js"></script>
-    <script src="entity/floorEntity.js"></script>
-    <script src="entity/FloorWTreeEntity.js"></script>
-    <script src="entity/bigBrickEntity.js"></script>
-    <script src="entity/coinEntity.js"></script>
-
-    <script src="component/HealthComponent.js"></script>
-    <script src="component/enemyMovementComponent.js"></script>
-    <script src="component/bulletMovementComponent.js"></script>
-    <script src="component/stateComponent.js"></script>
-    <script src="GeneralEnums.js"></script>
-
-    <script src="system/ConditionCheckSystem.js"></script>
-    <script src="system/graphicsSystem.js"></script>
-    <script src="system/inputSystem.js"></script>
-    <script src="system/physicsSystem.js"></script>
-    <script src="system/maintenanceSystem.js"></script>
-    <script src="system/stateSystem.js"></script>
-
-    <script src="GameStateService.js"></script>
-    <script src="WorldStateService.js"></script>
-    <script src="BodyFactory.js"></script>
-    <script src="Configuration.js"></script>
-    <script src="main-lvl-editor.js"></script>
+    <script type="module" src="main-lvl-editor.js"></script>
 
     <canvas id="secondCanv" width="800" height="600" style="background:  0% 0% / contain rgb(180, 180, 224);"></canvas><br><br>
 
@@ -78,12 +39,12 @@
     <option value="BIGBRICK">bigBrick</option>
   </select>
   <br><br>
-  <button type="button" id="moveBackBtn" onclick="onSendBackButtonClick()">Send sprite back</button>
+  <button type="button" id="moveBackBtn">Send sprite back</button>
   <br><br>
-  <button type="button" id="exportBtn" onclick="onExportButtonClick()">Export scene</button>
+  <button type="button" id="exportBtn" >Export scene</button>
   <br><br>
   <input id="file-input-import" type="file" name="file-input-import" />
   <br><br>
-  <button type="button" id="importBtn" onclick="onImportButtonClick()">Import scene</button>
+  <button type="button" id="importBtn"">Import scene</button>
   </body>
 </html>

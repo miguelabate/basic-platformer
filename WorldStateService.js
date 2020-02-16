@@ -1,7 +1,12 @@
 /**
  * Singleton service that maitains the state of the world and provides methods to add and query bodies in it
  */
-class WorldStateService {
+import {bodyFactory} from './main.js';
+import {GlobalConfig} from "./Configuration.js";
+import {BearingEnum} from "./GeneralEnums.js";
+import {World} from "./Configuration.js";
+
+export class WorldStateService {
 
     entitiesManager = undefined;//entities manager
     world = undefined;//matter js world
@@ -9,7 +14,7 @@ class WorldStateService {
 
     constructor(entitiesManager) {
         this.entitiesManager = entitiesManager;
-        this.engine = Engine.create();
+        this.engine = Matter.Engine.create();
         this.engine.world.gravity.y = GlobalConfig.physics.gravity;
         this.world = this.engine.world;
     }
@@ -35,10 +40,10 @@ class WorldStateService {
         let bulletBody;
 
         if(playerEntity.bearing === BearingEnum.RIGHT) {
-            bulletBody = BodyFactory.createBullet(playerEntity.body.bounds.max.x + 30, playerEntity.body.position.y - 10);
+            bulletBody = bodyFactory.createBullet(playerEntity.body.bounds.max.x + 30, playerEntity.body.position.y - 10);//TODO: continue here, make this a module bodyFActory
             bulletEntity.bearing = BearingEnum.RIGHT;
         }else{
-            bulletBody = BodyFactory.createBullet(playerEntity.body.bounds.min.x - 30, playerEntity.body.position.y - 10);
+            bulletBody = bodyFactory.createBullet(playerEntity.body.bounds.min.x - 30, playerEntity.body.position.y - 10);
             bulletEntity.bearing = BearingEnum.LEFT;
         }
 

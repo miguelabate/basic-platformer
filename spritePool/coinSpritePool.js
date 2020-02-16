@@ -1,8 +1,12 @@
-class CoinSpritesPool extends SpritePool {
+import {SpritePool} from "./spritePool.js";
+import {CoinStateEnum} from "../GeneralEnums.js";
+import {GlobalConfig, resources} from "../Configuration.js";
+
+export class CoinSpritesPool extends SpritePool {
     _rotateTextures= [];
     _disappearTextures= [];
 
-    constructor() {
+    constructor(spriteAmount = 5) {
         super();
         this.sprites[CoinStateEnum.ROTATE]=[];
         this.sprites[CoinStateEnum.DISAPPEAR]=[];
@@ -14,7 +18,7 @@ class CoinSpritesPool extends SpritePool {
         this._disappearTextures.push(resources["images/game/game.json"].spritesheet.textures["coin-fade-1.png"]);
         this._disappearTextures.push(resources["images/game/game.json"].spritesheet.textures["coin-fade-2.png"]);
         this._disappearTextures.push(resources["images/game/game.json"].spritesheet.textures["coin-fade-3.png"]);
-        this.addCoinSprites(5);
+        this.addCoinSprites(spriteAmount);
     }
 
     addCoinSprites(amount) {

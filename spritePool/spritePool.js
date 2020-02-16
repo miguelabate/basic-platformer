@@ -1,4 +1,4 @@
-class SpritePool {
+export class SpritePool {
 
     constructor() {
         this.sprites = {"DEFAULT":[]};

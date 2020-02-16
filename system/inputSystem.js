@@ -1,4 +1,9 @@
-class InputSystem {
+import {BearingEnum, BulletStateEnum} from "../GeneralEnums.js";
+import {BulletEntity} from "../entity/bulletEntity.js";
+import {StateComponent} from "../component/stateComponent.js";
+import {Body} from "../Configuration.js";
+
+export class InputSystem {
 
     worldStateService = undefined;//worldStateService
     entitiesManager = undefined;//EntitiesManager

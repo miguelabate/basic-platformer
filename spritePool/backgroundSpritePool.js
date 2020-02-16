@@ -1,8 +1,12 @@
-class BackgroundSpritesPool extends SpritePool {
+import {SpritePool} from "./spritePool.js";
+import {GenericStateEnum} from "../GeneralEnums.js";
+import {GlobalConfig,resources,TilingSprite} from "../Configuration.js";
 
-    constructor() {
+export class BackgroundSpritesPool extends SpritePool {
+
+    constructor(spriteAmount = 1) {
         super();
-        this.addBackgroundSprites(1,"images/game/game.json");
+        this.addBackgroundSprites(spriteAmount,"images/game/game.json");
     }
 
     addBackgroundSprites(amount, resourceId) {

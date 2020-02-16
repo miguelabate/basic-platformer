@@ -1,4 +1,9 @@
-class BulletEntity {
+import {GlobalConfig} from "../Configuration.js";
+import {BearingEnum, GenericStateEnum} from "../GeneralEnums.js";
+import {StateComponent} from "../component/stateComponent.js";
+import {BulletMovementComponent} from "../component/bulletMovementComponent.js";
+
+export class BulletEntity {
 
     type=GlobalConfig.entities.bullet.type;
     body={};//Matter Body

@@ -1,4 +1,4 @@
-class HealthComponent {
+export class HealthComponent {
 
     _maxHealth=undefined;
     _currentHealth=undefined;

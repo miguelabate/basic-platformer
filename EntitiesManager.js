@@ -1,4 +1,6 @@
-class EntitiesManager {
+import {GenericStateEnum} from "./GeneralEnums.js";
+
+export class EntitiesManager {
 
     bulletEntitiesList=[]; //sprite, body, existsOutsideViewPort=false,viewPort, selfmovement
     playerEntitiesList=[];//sprite, body,viewPort

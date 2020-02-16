@@ -1,4 +1,7 @@
-class EnemyMovementComponent {
+import {BearingEnum, EnemyStateEnum, GenericStateEnum} from "../GeneralEnums.js";
+import {Body} from "../Configuration.js";
+
+export class EnemyMovementComponent {
 
     constructor()  {
         this._seed=Math.random();

@@ -1,25 +1,27 @@
-// aliases for Matter
-var Engine = Matter.Engine,
-    Render = Matter.Render,
-    World = Matter.World,
-    Mouse = Matter.Mouse,
-    Events = Matter.Events,
-    Runner = Matter.Runner,
-    MouseConstraint = Matter.MouseConstraint,
-    Body = Matter.Body;
-Bodies = Matter.Bodies;
-
-//Aliases for PIXI
-let Application = PIXI.Application,
-    Container = PIXI.Container,
-    loader =PIXI.Loader.shared,
-    resources = PIXI.Loader.shared.resources,
-    TextureCache = PIXI.utils.TextureCache,
-    Rectangle = PIXI.Rectangle,
-    Sprite = PIXI.Sprite,
-    TilingSprite = PIXI.TilingSprite;
 
 //Define any variables that are used in more than one function
+
+import {GraphicsSystem} from "./system/graphicsSystem.js";
+import {BodyFactory} from "./BodyFactory.js";
+import {WorldStateService} from "./WorldStateService.js";
+import {PhysicsSystem} from "./system/physicsSystem.js";
+import {ViewPort} from "./ViewPort.js";
+import {EntitiesManager} from "./EntitiesManager.js";
+import {GameStateService} from "./GameStateService.js";
+import {InputSystem} from "./system/inputSystem.js";
+import {MaintenanceSystem} from "./system/maintenanceSystem.js";
+import {StateSystem} from "./system/stateSystem.js";
+import {ConditionCheckSystem} from "./system/ConditionCheckSystem.js";
+import {GlobalConfig, loader, Render, Mouse, MouseConstraint, World} from "./Configuration.js";
+import {PlayerEntity} from "./entity/playerEntity.js";
+import {CoinEntity} from "./entity/coinEntity.js";
+import {FloorEntity} from "./entity/floorEntity.js";
+import {FloorWTreeEntity} from "./entity/FloorWTreeEntity.js";
+import {EnemyEntity} from "./entity/enemyEntity.js";
+import {EnemyMovementComponent} from "./component/enemyMovementComponent.js";
+import {BigBrickEntity} from "./entity/bigBrickEntity.js";
+import {BackgroundEntity} from "./entity/backgroundEntity.js";
+
 
 let entitiesManager;
 
@@ -27,7 +29,8 @@ let runner;
 
 let graphicsSystem, inputSystem, physicsSystem, maintenanceSystem, stateSystem, conditionCheckSystem;
 
-let viewPort;
+export let viewPort;
+export let bodyFactory;
 
 let oldTime;
 let myWorldStateService, myGameStateService;
@@ -42,8 +45,12 @@ function main() {
 }
 
 function setup() {
+    $("#importBtn")[0].onclick =onImportButtonClick;
+
     //global viewport set
     viewPort = new ViewPort({width:GlobalConfig.viewport.width, height:GlobalConfig.viewport.height});
+    //body factiry
+    bodyFactory = new BodyFactory();
     //create entities manager
     entitiesManager = new EntitiesManager();
     //world state service
@@ -64,39 +71,40 @@ function setup() {
     //condition check system
     conditionCheckSystem = new ConditionCheckSystem(entitiesManager, myWorldStateService, myGameStateService)
     //MatterJs stuff
-    createMatterModel();
+    addDebugRendererForMatterJs();
 
-    entitiesManager.addBackgroundEntity(new BackgroundEntity());
+    // entitiesManager.addBackgroundEntity(new BackgroundEntity());
 
     //for deltas time
     oldTime = performance.now();
+    myGameStateService.setGameIsPlaying(false);
 
    requestAnimationFrame(gameLoop);
 }
 
 function gameLoop(delta) {
 
-    if(!myGameStateService.getGameIsPlaying()) return;//game ended
+    if(myGameStateService.getGameIsPlaying()) {
 
-    let newTime = performance.now();
-    let deltaTime = newTime - oldTime;
-    oldTime = newTime;
-    // lag += deltaTime;
+        let newTime = performance.now();
+        let deltaTime = newTime - oldTime;
+        oldTime = newTime;
+        // lag += deltaTime;
 
-    inputSystem.update(deltaTime);
+        inputSystem.update(deltaTime);
 
-    physicsSystem.update(deltaTime);
+        physicsSystem.update(deltaTime);
 
-    stateSystem.update();
+        stateSystem.update();
 
-    //update graphics and render
-    graphicsSystem.update();
+        //update graphics and render
+        graphicsSystem.update();
 
-    conditionCheckSystem.update();
+        conditionCheckSystem.update();
 
-    //clean up stuff
-    maintenanceSystem.update();
-
+        //clean up stuff
+        maintenanceSystem.update();
+    }
     requestAnimationFrame(gameLoop);
      // debugGetFPS();
 
@@ -111,7 +119,7 @@ function debugGetFPS(){
     this.fps=(this.frameCount/(new Date().getTime()-this.startTime.getTime()))*1000;
 
 }
-function createMatterModel() {
+function addDebugRendererForMatterJs() {
 
     // create a renderer
     var render = Render.create({
@@ -123,65 +131,6 @@ function createMatterModel() {
         engine: physicsSystem.engine
     });
 
-    //floor w tree
-    let floorWTreeBody = BodyFactory.createFloorWTree(404,468);
-    let floorWTreeEntity = new FloorWTreeEntity();
-    floorWTreeEntity.body = floorWTreeBody;
-    floorWTreeEntity.viewPort = viewPort;
-    entitiesManager.addFloorWTreeEntity(floorWTreeEntity);
-    World.add(physicsSystem.engine.world, floorWTreeEntity.body);
-
-    //dynamic floor
-    for(let i=0;i<10;i++) {
-
-        let floor;
-        if(Math.random()>0.2) {
-            floor = BodyFactory.createFloorThin(-300 + i * 64,500);
-        }else{
-            floor = BodyFactory.createFloorThin(-300 + i * 64,436);
-        }
-        let floorEntity = new FloorEntity();
-        floorEntity.body = floor;
-        floorEntity.viewPort = viewPort;
-        entitiesManager.addFloorEntity(floorEntity);
-        World.add(physicsSystem.engine.world, floorEntity.body);
-    }
-    // eney entity spawner
-    setInterval(function(){
-        let enemyEntity = new EnemyEntity();
-        enemyEntity.body =  BodyFactory.createEnemy(600, 100);;
-        enemyEntity.viewPort = viewPort;
-        enemyEntity.selfMovement = new EnemyMovementComponent();
-        World.add(physicsSystem.engine.world, enemyEntity.body );
-        entitiesManager.addEnemyEntity(enemyEntity);
-        }, 4000);
-
-
-    //player entity
-    let playerEntity = new PlayerEntity();
-    playerEntity.body =  BodyFactory.createPlayer(170, 350);
-    playerEntity.viewPort = viewPort;
-    World.add(physicsSystem.engine.world, playerEntity.body );
-    entitiesManager.addPlayerEntity(playerEntity);
-
-    // bigbrick
-    let bigbrick = BodyFactory.createBigBrick(GlobalConfig.entities.bigBrick.width/2, 250);
-    let bigBrickEntity = new BigBrickEntity();
-    bigBrickEntity.body = bigbrick;
-    bigBrickEntity.viewPort = viewPort;
-    entitiesManager.addBigBrickEntity(bigBrickEntity);
-    World.add(physicsSystem.engine.world, bigBrickEntity.body );
-
-    //some coin
-    for(let i=0;i<5;i++) {
-        let coinEntity = new CoinEntity();
-        coinEntity.body =  BodyFactory.createCoin(250+i*100, 300);
-        coinEntity.viewPort = viewPort;
-        entitiesManager.addCoinEntity(coinEntity);
-        World.add(physicsSystem.engine.world, coinEntity.body );
-    }
-
-    //engine.timing.timeScale = 0;//this pauses the engine
     // run the renderer
    Render.run(render);
 
@@ -203,7 +152,68 @@ function createMatterModel() {
     // render.mouse = mouse;
 }
 
+export function onImportButtonClick(event)
+{
+    let file = $("#file-input-import")[0].files[0];
+    if (!file) {
+        return;
+    }
+    let reader = new FileReader();
+    reader.onload = function(e) {
+        let contents = e.target.result;
+        console.log(contents);
+        let parsedMap = JSON.parse(contents);
+        //create elements
+        for(let i=0;i<parsedMap.elements.length;i++){
+            generateEntity(parsedMap.elements[i].type, parsedMap.elements[i].x, parsedMap.elements[i].y);
 
+        }
+
+        //run it
+        myGameStateService.setGameIsPlaying(true);
+    };
+    reader.readAsText(file);
+
+
+}
+
+function generateEntity(type, realx, realy) {
+    if(type === GlobalConfig.entities.player.type){
+        let playerEntity = new PlayerEntity();
+        playerEntity.body =  bodyFactory.createPlayer(realx, realy);
+        World.add(physicsSystem.engine.world, playerEntity.body );
+        entitiesManager.addPlayerEntity(playerEntity);
+    } else  if(type === GlobalConfig.entities.coin.type){
+        let coinEntity = new CoinEntity();
+        coinEntity.body =  bodyFactory.createCoin(realx, realy);
+        entitiesManager.addCoinEntity(coinEntity);
+        World.add(physicsSystem.engine.world, coinEntity.body );
+    } else  if(type === GlobalConfig.entities.floorThin.type){
+        let floorEntity = new FloorEntity();
+        floorEntity.body =  bodyFactory.createFloorThin(realx,realy);
+        entitiesManager.addFloorEntity(floorEntity);
+        World.add(physicsSystem.engine.world, floorEntity.body);
+    } else  if(type === GlobalConfig.entities.floorWTree.type){
+        let floorWTreeEntity = new FloorWTreeEntity();
+        floorWTreeEntity.body =  bodyFactory.createFloorWTree(realx,realy);
+        entitiesManager.addFloorWTreeEntity(floorWTreeEntity);
+        World.add(physicsSystem.engine.world, floorWTreeEntity.body);
+    } else  if(type === GlobalConfig.entities.enemy.type){
+        let enemyEntity = new EnemyEntity();
+        enemyEntity.body =  bodyFactory.createEnemy(realx, realy);;
+        enemyEntity.selfMovement = new EnemyMovementComponent();
+        World.add(physicsSystem.engine.world, enemyEntity.body );
+        entitiesManager.addEnemyEntity(enemyEntity);
+    } else  if(type === GlobalConfig.entities.bigBrick.type){
+        let bigBrickEntity = new BigBrickEntity();
+        bigBrickEntity.body = bodyFactory.createBigBrick(realx, realy);
+        entitiesManager.addBigBrickEntity(bigBrickEntity);
+        World.add(physicsSystem.engine.world, bigBrickEntity.body );
+    } else  if(type === GlobalConfig.entities.background.type){
+        entitiesManager.addBackgroundEntity(new BackgroundEntity());
+    }
+
+}
 
 $(document).ready(function () {
     main();

@@ -1,4 +1,4 @@
-class MaintenanceSystem {
+export class MaintenanceSystem {
 
     entitiesManager = undefined;//entities manager
 

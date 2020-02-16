@@ -1,9 +1,13 @@
-class BulletSpritesPool extends SpritePool {
+import {SpritePool} from "./spritePool.js";
+import {BulletStateEnum} from "../GeneralEnums.js";
+import {GlobalConfig, Sprite, resources} from "../Configuration.js";
 
-    constructor() {
+export class BulletSpritesPool extends SpritePool {
+
+    constructor(spriteAmount = 20) {
         super();
         this.sprites[BulletStateEnum.MOVING]=[];
-        this.addBulletSprites(20,"images/game/game.json");
+        this.addBulletSprites(spriteAmount,"images/game/game.json");
     }
 
     addBulletSprites(amount, resourceId) {
@@ -18,6 +22,6 @@ class BulletSpritesPool extends SpritePool {
             sprite.customState= BulletStateEnum.MOVING;//custom field
             this.sprites[BulletStateEnum.MOVING].push(sprite);
         }
-    };
+    }
 
 }

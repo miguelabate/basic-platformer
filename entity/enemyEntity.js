@@ -1,4 +1,8 @@
-class EnemyEntity {
+import {GlobalConfig} from "../Configuration.js";
+import {StateComponent} from "../component/stateComponent.js";
+import {EnemyStateEnum} from "../GeneralEnums.js";
+
+export class EnemyEntity {
 
     type = GlobalConfig.entities.enemy.type;
     body = undefined;//Matter Body

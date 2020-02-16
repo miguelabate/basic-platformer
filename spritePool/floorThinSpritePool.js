@@ -1,8 +1,12 @@
-class FloorThinSpritesPool extends SpritePool {
+import {SpritePool} from "./spritePool.js";
+import {GenericStateEnum} from "../GeneralEnums.js";
+import {GlobalConfig, resources, Sprite} from "../Configuration.js";
 
-    constructor() {
+export class FloorThinSpritesPool extends SpritePool {
+
+    constructor(spriteAmount = 50) {
         super();
-        this.addFloorThinSprites(50,"images/game/game.json");
+        this.addFloorThinSprites(spriteAmount,"images/game/game.json");
     }
 
     addFloorThinSprites(amount, resourceId) {

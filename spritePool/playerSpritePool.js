@@ -1,10 +1,14 @@
-class PlayerSpritesPool extends SpritePool {
+import {SpritePool} from "./spritePool.js";
+import {PlayerStateEnum} from "../GeneralEnums.js";
+import {GlobalConfig,resources, Sprite} from "../Configuration.js";
+
+export class PlayerSpritesPool extends SpritePool {
 
     walkingTextures = [];
     restTextures = [];
     jumpTextures = [];
 
-    constructor() {
+    constructor(spriteAmount = 1) {
         super();
         this.sprites[PlayerStateEnum.MOVE_LEFT]=[];
         this.sprites[PlayerStateEnum.MOVE_RIGHT]=[];
@@ -17,7 +21,7 @@ class PlayerSpritesPool extends SpritePool {
         this.walkingTextures.push(resources["images/game/game.json"].spritesheet.textures["player-walk-2.png"]);
         this.walkingTextures.push(resources["images/game/game.json"].spritesheet.textures["player-walk-3.png"]);
         this.jumpTextures.push(resources["images/game/game.json"].spritesheet.textures["player-jump.png"]);
-        this.addPlayerSprites(1);
+        this.addPlayerSprites(spriteAmount);
     }
 
     addPlayerSprites(amount) {

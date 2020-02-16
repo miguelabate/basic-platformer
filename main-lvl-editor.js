@@ -1,48 +1,40 @@
-// aliases for Matter
-var Engine = Matter.Engine,
-    Render = Matter.Render,
-    World = Matter.World,
-    Mouse = Matter.Mouse,
-    Events = Matter.Events,
-    Runner = Matter.Runner,
-    MouseConstraint = Matter.MouseConstraint,
-    Body = Matter.Body;
-Bodies = Matter.Bodies;
+import {ViewPort} from "./ViewPort.js";
 
-//Aliases for PIXI
-let Application = PIXI.Application,
-    Container = PIXI.Container,
-    loader =PIXI.Loader.shared,
-    resources = PIXI.Loader.shared.resources,
-    TextureCache = PIXI.utils.TextureCache,
-    Rectangle = PIXI.Rectangle,
-    Sprite = PIXI.Sprite,
-    TilingSprite = PIXI.TilingSprite;
+import {GlobalConfig, loader} from "./Configuration.js";
+
+import {BulletSpritesPool} from "./spritePool/bulletSpritePool.js";
+import {PlayerSpritesPool} from "./spritePool/playerSpritePool.js";
+import {EnemySpritesPool} from "./spritePool/enemySpritePool.js";
+import {BackgroundSpritesPool} from "./spritePool/backgroundSpritePool.js";
+import {FloorThinSpritesPool} from "./spritePool/floorThinSpritePool.js";
+import {BigBrickSpritesPool} from "./spritePool/bigBrickSpritePool.js";
+import {CoinSpritesPool} from "./spritePool/coinSpritePool.js";
+import {FloorWTreeSpritesPool} from "./spritePool/FloorWTreeSpritePool.js";
+import {CoinStateEnum, EnemyStateEnum, GenericStateEnum, PlayerStateEnum} from "./GeneralEnums.js";
 
 //Define any variables that are used in more than one function
 
 let viewPort,pixiRenderer, stage;
 let selectedSprite, genId=0;
+let bulletSpritePool, playerSpritePool, enemiesSpritePool,backgroundSpritePool,floorThinSpritePool,bigBrickSpritePool,coinSpritePool,floorWTreeSpritePool;
 
 function initSpritePools(){
     //bullet sprite pool init
     bulletSpritePool =  new BulletSpritesPool();
-//bullet sprite pool init
-    playerSpritePool =  new PlayerSpritesPool();
-//enemy sprite pool init
-    enemiesSpritePool =  new EnemySpritesPool();
-//background sprites pool
-    backgroundSpritePool = new BackgroundSpritesPool();
-//background sprites pool
-    floorThinSpritePool = new FloorThinSpritesPool();
-//bigbrick sprites pool
-    bigBrickSpritePool = new BigBrickSpritesPool();
-//coin sprites pool
-    coinSpritePool = new CoinSpritesPool();
-//coin sprites pool
-    floorWTreeSpritePool = new FloorWTreeSpritesPool();
-
-    backgroundSpritePool  = new BackgroundSpritesPool();
+    //player sprite pool init
+    playerSpritePool =  new PlayerSpritesPool(1);
+    //enemy sprite pool init
+    enemiesSpritePool =  new EnemySpritesPool(100);
+    //background sprites pool
+    backgroundSpritePool = new BackgroundSpritesPool(1);
+    //floor thin sprites pool
+    floorThinSpritePool = new FloorThinSpritesPool(200);
+    //bigbrick sprites pool
+    bigBrickSpritePool = new BigBrickSpritesPool(200);
+    //coin sprites pool
+    coinSpritePool = new CoinSpritesPool(300);
+    //floor w tree sprites pool
+    floorWTreeSpritePool = new FloorWTreeSpritesPool(100);
 }
 
 function keyBindings(){
@@ -82,6 +74,10 @@ function main() {
 }
 
 function setup() {
+    $("#importBtn")[0].onclick =onImportButtonClick;
+    $("#exportBtn")[0].onclick =onExportButtonClick;
+    $("#moveBackBtn")[0].onclick =onSendBackButtonClick;
+
     initSpritePools();
     keyBindings();
 
@@ -146,7 +142,7 @@ function generateSpriteOf(spritetype, realx, realy) {
         sprite = coinSpritePool.borrowSpriteWithState(CoinStateEnum.ROTATE);
     } else  if(spritetype === GlobalConfig.entities.floorThin.type){
         sprite = floorThinSpritePool.borrowSpriteWithState(GenericStateEnum.DEFAULT);
-    } else  if(spritetype === GlobalConfig.entities.floorThin.type){
+    } else  if(spritetype === GlobalConfig.entities.floorWTree.type){
         sprite = floorWTreeSpritePool.borrowSpriteWithState(GenericStateEnum.DEFAULT);
     } else  if(spritetype === GlobalConfig.entities.enemy.type){
         sprite = enemiesSpritePool.borrowSpriteWithState(EnemyStateEnum.MOVE_RIGHT);

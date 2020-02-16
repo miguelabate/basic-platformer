@@ -1,4 +1,4 @@
-class ViewPort {
+export class ViewPort {
 
     offset = {x:0, y:0};
     size={width:800, height:600}; //size of the viewport

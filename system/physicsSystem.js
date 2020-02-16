@@ -1,4 +1,8 @@
-class PhysicsSystem {
+import {viewPort,bodyFactory} from '../main.js';
+import {GlobalConfig, Events, Engine, World} from '../Configuration.js';
+import {CoinStateEnum, EnemyStateEnum, GenericStateEnum} from "../GeneralEnums.js";
+
+export class PhysicsSystem {
 
     entitiesManager = undefined;//entities manager
     engine = undefined; //matter engine
@@ -29,7 +33,7 @@ class PhysicsSystem {
         }
 
         //eliminate bodies of entities that should not exiss outside viewport
-        let entities = entitiesManager.getEntitiesThatDoNotExistsOutsideViewPort();
+        let entities = this.entitiesManager.getEntitiesThatDoNotExistsOutsideViewPort();
         for(let i=entities.length-1;i>=0;i--){
             if(!this.isVisible(entities[i])&& entities[i].body) {
                 entities[i].state.setState(GenericStateEnum.TO_REMOVE);
@@ -37,7 +41,7 @@ class PhysicsSystem {
         }
 
         //eliminate bodies of entities with state TO_REMOVE
-        entities = entitiesManager.getEntitiesByState(GenericStateEnum.TO_REMOVE);
+        entities =this.entitiesManager.getEntitiesByState(GenericStateEnum.TO_REMOVE);
         for(let i=entities.length-1;i>=0;i--){
             World.remove(this.engine.world, entities[i].body);
             delete entities[i].body;
@@ -79,42 +83,42 @@ class PhysicsSystem {
         }
 
         //collision coin
-        if(aElm.customType===GlobalConfig.entities.coin.type  || bElm.customType===GlobalConfig.entities.coin.type){
-            let bodyId;
-            if(aElm.customType===GlobalConfig.entities.coin.type )bodyId=aElm.id;
-            if(bElm.customType===GlobalConfig.entities.coin.type )bodyId=bElm.id;
+        if(this.isCollisionBetweenTypeAndAny(aElm, bElm,GlobalConfig.entities.coin.type)) {
+            this.handleCollisionBetweenCoinAndAnything(aElm,bElm);
+        }
+    }
 
-            console.log("coin collected!");
-            let coinEntity = entitiesManager.getCoinEntityByBodyId(bodyId);
-            if(coinEntity!==undefined) {
-                if(coinEntity.state.getState()!== GenericStateEnum.TO_REMOVE)
-                    coinEntity.state.setState(CoinStateEnum.DISAPPEAR);
-            }
+    handleCollisionBetweenCoinAndAnything(aElm, bElm) {
+        console.log("coin collected!");
+        let coinEntity = this.entitiesManager.getCoinEntityByBodyId(this.getIdOfType(aElm, bElm, GlobalConfig.entities.coin.type));
+        if(coinEntity!==undefined) {
+            if(coinEntity.state.getState()!== GenericStateEnum.TO_REMOVE)
+                coinEntity.state.setState(CoinStateEnum.DISAPPEAR);
         }
     }
 
     handleCollisionBetweenBulletAndAnything(aElm, bElm) {
         console.log("Bullet Missed!");
         //    physicsSys.worldStateService.removeBulletBodyFromEntitiesList(physicsSys.getIdOfType(aElm, bElm, GlobalConfig.entities.bullet.type));
-        let bulletEntity = entitiesManager.getBulletEntityByBodyId(this.getIdOfType(aElm, bElm, GlobalConfig.entities.bullet.type));
+        let bulletEntity = this.entitiesManager.getBulletEntityByBodyId(this.getIdOfType(aElm, bElm, GlobalConfig.entities.bullet.type));
         bulletEntity.state.setState(GenericStateEnum.TO_REMOVE);
     }
 
     handleCollisionBetweenBulletAndEnemy(aElm, bElm) {
         console.log("Killed Enemy!");
         // mark bullet to be removed
-        let bulletEntity = entitiesManager.getBulletEntityByBodyId(this.getIdOfType(aElm, bElm, GlobalConfig.entities.bullet.type));
+        let bulletEntity = this.entitiesManager.getBulletEntityByBodyId(this.getIdOfType(aElm, bElm, GlobalConfig.entities.bullet.type));
         bulletEntity.state.setState(GenericStateEnum.TO_REMOVE);
         //state of th enemy to start dying. set filter so it doesnt interfere
-        let enemyEntity = entitiesManager.getEnemyEntityByBodyId(this.getIdOfType(aElm, bElm, GlobalConfig.entities.enemy.type));
+        let enemyEntity = this.entitiesManager.getEnemyEntityByBodyId(this.getIdOfType(aElm, bElm, GlobalConfig.entities.enemy.type));
         enemyEntity.state.setState(EnemyStateEnum.DISAPPEAR);
-        enemyEntity.body.collisionFilter.mask = ~(CategoriesFilter.COIN | CategoriesFilter.PLAYER | CategoriesFilter.BULLET);
+        enemyEntity.body.collisionFilter.mask = ~(bodyFactory.categoriesFilter.COIN | bodyFactory.categoriesFilter.PLAYER | bodyFactory.categoriesFilter.BULLET);
     }
 
     handleCollisionBetweenPlayerAndEnemy(aElm, bElm) {
         console.log("YOu were hit!");
         // mark bullet to be removed
-        let playerEntity = entitiesManager.getPlayerEntityByBodyId(this.getIdOfType(aElm, bElm, GlobalConfig.entities.player.type));
+        let playerEntity = this.entitiesManager.getPlayerEntityByBodyId(this.getIdOfType(aElm, bElm, GlobalConfig.entities.player.type));
         playerEntity.health.decreaseHealth(10);
 
     }

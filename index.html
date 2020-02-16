@@ -18,47 +18,12 @@
     </style>
   </head>
   <body>
-  <script src="spritePool/spritePool.js"></script>
-  <script src="spritePool/bulletSpritePool.js"></script>
-    <script src="spritePool/playerSpritePool.js"></script>
-    <script src="spritePool/backgroundSpritePool.js"></script>
-    <script src="spritePool/enemySpritePool.js"></script>
-    <script src="spritePool/floorThinSpritePool.js"></script>
-    <script src="spritePool/bigBrickSpritePool.js"></script>
-    <script src="spritePool/coinSpritePool.js"></script>
-    <script src="spritePool/FloorWTreeSpritePool.js"></script>
-
-    <script src="EntitiesManager.js"></script>
-    <script src="ViewPort.js"></script>
-
-    <script src="entity/bulletEntity.js"></script>
-    <script src="entity/playerEntity.js"></script>
-    <script src="entity/enemyEntity.js"></script>
-    <script src="entity/backgroundEntity.js"></script>
-    <script src="entity/floorEntity.js"></script>
-    <script src="entity/FloorWTreeEntity.js"></script>
-    <script src="entity/bigBrickEntity.js"></script>
-    <script src="entity/coinEntity.js"></script>
-
-    <script src="component/HealthComponent.js"></script>
-    <script src="component/enemyMovementComponent.js"></script>
-    <script src="component/bulletMovementComponent.js"></script>
-    <script src="component/stateComponent.js"></script>
-    <script src="GeneralEnums.js"></script>
-
-    <script src="system/ConditionCheckSystem.js"></script>
-    <script src="system/graphicsSystem.js"></script>
-    <script src="system/inputSystem.js"></script>
-    <script src="system/physicsSystem.js"></script>
-    <script src="system/maintenanceSystem.js"></script>
-    <script src="system/stateSystem.js"></script>
-
-    <script src="GameStateService.js"></script>
-    <script src="WorldStateService.js"></script>
-    <script src="BodyFactory.js"></script>
-    <script src="Configuration.js"></script>
-    <script src="main.js"></script>
+    <script type="module" src="main.js"></script>
 
     <canvas id="secondCanv" width="800" height="600" style="background:  0% 0% / contain rgb(180, 180, 224);"></canvas>
+    <br><br>
+    <input id="file-input-import" type="file" name="file-input-import" />
+    <br><br>
+    <button type="button" id="importBtn" >Import scene</button>
   </body>
 </html>

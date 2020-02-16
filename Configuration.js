@@ -1,4 +1,4 @@
-let GlobalConfig = {};
+export let GlobalConfig = {};
 
 GlobalConfig.viewport = {
     width:960,
@@ -61,3 +61,25 @@ GlobalConfig.entities.floorWTree = {
         relY:212
     }
 };
+
+
+// aliases for Matter
+export let Engine = Matter.Engine,
+    Render = Matter.Render,
+    World = Matter.World,
+    Mouse = Matter.Mouse,
+    Events = Matter.Events,
+    Runner = Matter.Runner,
+    MouseConstraint = Matter.MouseConstraint,
+    Body = Matter.Body,
+    Bodies = Matter.Bodies;
+
+//Aliases for PIXI
+export let Application = PIXI.Application,
+    Container = PIXI.Container,
+    loader =PIXI.Loader.shared,
+    resources = PIXI.Loader.shared.resources,
+    TextureCache = PIXI.utils.TextureCache,
+    Rectangle = PIXI.Rectangle,
+    Sprite = PIXI.Sprite,
+    TilingSprite = PIXI.TilingSprite;

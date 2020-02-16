@@ -1,8 +1,12 @@
-class FloorWTreeSpritesPool extends SpritePool {
+import {SpritePool} from "./spritePool.js";
+import {GenericStateEnum} from "../GeneralEnums.js";
+import {GlobalConfig, resources,Sprite} from "../Configuration.js";
 
-    constructor() {
+export class FloorWTreeSpritesPool extends SpritePool {
+
+    constructor(spriteAmount=2) {
         super();
-        this.addFloorWTreeSprites(2,"images/game/game.json");
+        this.addFloorWTreeSprites(spriteAmount,"images/game/game.json");
     }
 
     addFloorWTreeSprites(amount, resourceId) {

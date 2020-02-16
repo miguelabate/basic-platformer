@@ -1,9 +1,13 @@
-class EnemySpritesPool extends SpritePool {
+import {SpritePool} from "./spritePool.js";
+import {EnemyStateEnum} from "../GeneralEnums.js";
+import {GlobalConfig,resources} from "../Configuration.js";
+
+export class EnemySpritesPool extends SpritePool {
 
     walkingTextures = [];
     dyingTextures = [];
 
-    constructor() {
+    constructor(spriteAmount= 5) {
         super();
         this.sprites[EnemyStateEnum.MOVE_LEFT]=[];
         this.sprites[EnemyStateEnum.MOVE_RIGHT]=[];
@@ -16,7 +20,7 @@ class EnemySpritesPool extends SpritePool {
         this.dyingTextures.push(resources["images/game/game.json"].spritesheet.textures["enemy-fade-2.png"]);
         this.dyingTextures.push(resources["images/game/game.json"].spritesheet.textures["enemy-fade-3.png"]);
         this.dyingTextures.push(resources["images/game/game.json"].spritesheet.textures["enemy-fade-4.png"]);
-        this.addEnemySprites(5);
+        this.addEnemySprites(spriteAmount);
     }
 
     addEnemySprites(amount) {

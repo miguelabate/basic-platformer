@@ -1,8 +1,12 @@
-class BigBrickSpritesPool extends SpritePool {
+import {SpritePool} from "./spritePool.js";
+import {GenericStateEnum} from "../GeneralEnums.js";
+import {GlobalConfig, resources, Sprite} from "../Configuration.js";
 
-    constructor() {
+export class BigBrickSpritesPool extends SpritePool {
+
+    constructor(spriteAmount = 10) {
         super();
-        this.addBigBrickSprites(10,"images/game/game.json");
+        this.addBigBrickSprites(spriteAmount,"images/game/game.json");
     }
 
     addBigBrickSprites(amount, resourceId) {
@@ -11,7 +15,7 @@ class BigBrickSpritesPool extends SpritePool {
             let sprite = new Sprite(resources[resourceId].spritesheet.textures["big-brick-grey.png"]);
             sprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
             sprite.width = GlobalConfig.entities.bigBrick.width;
-            sprite.height =GlobalConfig.entities.bigBrick.height;
+            sprite.height = GlobalConfig.entities.bigBrick.height;
             sprite.anchor.x=0.5;
             sprite.anchor.y=0.5;
             sprite.customState= GenericStateEnum.DEFAULT;//custom field

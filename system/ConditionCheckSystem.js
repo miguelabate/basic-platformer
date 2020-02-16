@@ -1,7 +1,7 @@
 /**
  * System that polls the state and values of different entities and triggers action if certain conditions are met
  */
-class ConditionCheckSystem {
+export class ConditionCheckSystem {
 
     entitiesManager = undefined;//entities manager
     worldStateService = undefined;//worldStateService

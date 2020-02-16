@@ -1,4 +1,8 @@
-class BulletMovementComponent {
+import {BearingEnum} from "../GeneralEnums.js";
+import {GlobalConfig} from '../Configuration.js';
+import {Body} from "../Configuration.js";
+
+export class BulletMovementComponent {
 
     move(entity, engine) {
         let gravity = engine.world.gravity;

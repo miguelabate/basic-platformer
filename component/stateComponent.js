@@ -1,4 +1,4 @@
-class StateComponent {
+export class StateComponent {
 
     _state=undefined;
     _timeChanged=undefined;//age of this state
