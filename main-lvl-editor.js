@@ -91,9 +91,6 @@ function setup() {
 }
 
 function gameLoop(delta) {
-    // for(let i=0;i<stage.children.length;i++){
-    //     stage.children[i].position.x = stage.children[i].position.realx;
-    // }
     //render to canvas
     pixiRenderer.render(stage);
 

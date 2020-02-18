@@ -1,4 +1,4 @@
-import {viewPort} from '../main.js';
+import {viewPort} from '../ViewPort.js';
 import {GlobalConfig} from "../Configuration.js";
 import {BulletSpritesPool} from "../spritePool/bulletSpritePool.js";
 import {PlayerSpritesPool} from "../spritePool/playerSpritePool.js";

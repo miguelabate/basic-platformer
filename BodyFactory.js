@@ -76,3 +76,5 @@ export class BodyFactory {
         return body;
     }
 }
+
+export let bodyFactory = new BodyFactory();

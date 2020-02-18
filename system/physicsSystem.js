@@ -1,4 +1,5 @@
-import {viewPort,bodyFactory} from '../main.js';
+import {bodyFactory} from '../BodyFactory.js';
+import {viewPort} from '../ViewPort.js';
 import {GlobalConfig, Events, Engine, World} from '../Configuration.js';
 import {CoinStateEnum, EnemyStateEnum, GenericStateEnum} from "../GeneralEnums.js";
 

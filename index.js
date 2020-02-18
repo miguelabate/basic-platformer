@@ -2,10 +2,8 @@
 //Define any variables that are used in more than one function
 
 import {GraphicsSystem} from "./system/graphicsSystem.js";
-import {BodyFactory} from "./BodyFactory.js";
 import {WorldStateService} from "./WorldStateService.js";
 import {PhysicsSystem} from "./system/physicsSystem.js";
-import {ViewPort} from "./ViewPort.js";
 import {EntitiesManager} from "./EntitiesManager.js";
 import {GameStateService} from "./GameStateService.js";
 import {InputSystem} from "./system/inputSystem.js";
@@ -21,6 +19,8 @@ import {EnemyEntity} from "./entity/enemyEntity.js";
 import {EnemyMovementComponent} from "./component/enemyMovementComponent.js";
 import {BigBrickEntity} from "./entity/bigBrickEntity.js";
 import {BackgroundEntity} from "./entity/backgroundEntity.js";
+import {bodyFactory} from "./BodyFactory.js";
+import {viewPort} from "./ViewPort.js";
 
 
 let entitiesManager;
@@ -29,15 +29,18 @@ let runner;
 
 let graphicsSystem, inputSystem, physicsSystem, maintenanceSystem, stateSystem, conditionCheckSystem;
 
-export let viewPort;
-export let bodyFactory;
-
 let oldTime;
 let myWorldStateService, myGameStateService;
 
-function main() {
-    //Add the canvas that Pixi automatically created for you to the HTML document
-    //document.body.appendChild(pixiApp.view); not neccesary because I created the canvas manually
+$(document).ready(function () {
+    index();
+});
+
+function index() {
+    //do some events binding
+    $("#importBtn")[0].onclick =onImportButtonClick;
+
+    //pixi resource loader async
     loader
         .add("images/game/game.json")
         .load(setup);
@@ -45,12 +48,6 @@ function main() {
 }
 
 function setup() {
-    $("#importBtn")[0].onclick =onImportButtonClick;
-
-    //global viewport set
-    viewPort = new ViewPort({width:GlobalConfig.viewport.width, height:GlobalConfig.viewport.height});
-    //body factiry
-    bodyFactory = new BodyFactory();
     //create entities manager
     entitiesManager = new EntitiesManager();
     //world state service
@@ -122,7 +119,7 @@ function debugGetFPS(){
 function addDebugRendererForMatterJs() {
 
     // create a renderer
-    var render = Render.create({
+    let render = Render.create({
         element: document.body,
         options: {
             width: GlobalConfig.viewport.width,
@@ -135,9 +132,9 @@ function addDebugRendererForMatterJs() {
    Render.run(render);
 
     // add mouse control
-    var mouse = Mouse.create($("#secondCanv")[0]);
+    let mouse = Mouse.create($("#secondCanv")[0]);
     mouse.offset = viewPort.offset;//todo: kind of hack, but works
-    var mouseConstraint = MouseConstraint.create(physicsSystem.engine, {
+    let mouseConstraint = MouseConstraint.create(physicsSystem.engine, {
             mouse: mouse,
             constraint: {
                 stiffness: 0.2,
@@ -215,6 +212,3 @@ function generateEntity(type, realx, realy) {
 
 }
 
-$(document).ready(function () {
-    main();
-});

@@ -1,7 +1,7 @@
 /**
  * Singleton service that maitains the state of the world and provides methods to add and query bodies in it
  */
-import {bodyFactory} from './main.js';
+import {bodyFactory} from './BodyFactory.js';
 import {GlobalConfig} from "./Configuration.js";
 import {BearingEnum} from "./GeneralEnums.js";
 import {World} from "./Configuration.js";
@@ -27,7 +27,7 @@ export class WorldStateService {
         let playerLowerMaxX = playerBody.bounds.max.x;
         let playerLowerY = playerBody.bounds.max.y; //take lower left point of the player, enough for now to check contact
 
-        //this emthod can be optimized, stop when reaches 2
+        //this method can be optimized, stop when reaches 2
         return Matter.Query.region(allBodies,{min:{x:playerLowerMinX,y:playerLowerY},max:{x:playerLowerMaxX,y:playerLowerY+5}},false).length>1;
     }
 

@@ -1,3 +1,5 @@
+import {GlobalConfig} from "./Configuration.js";
+
 export class ViewPort {
 
     offset = {x:0, y:0};
@@ -17,3 +19,5 @@ export class ViewPort {
     }
 
 }
+
+export let viewPort = new ViewPort({width:GlobalConfig.viewport.width, height:GlobalConfig.viewport.height});
